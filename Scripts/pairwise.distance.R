@@ -6,11 +6,10 @@ index = as.integer( args[1] )
 print("Doing transport on index")
 print( index )
 load("../../Data/all.trees.Rdata")
-
-gmra = list()
-data = list()
-weights = list()
-for( i in 1:length(all$data) ){
+gmra = vector("list", 42)
+data = vector("list", 42)
+weights = vector("list", 42)
+for( i in index:length(all$data) ){
   X = all$data[[i]][,1:4]
   X = X[ seq(1, nrow(X), by=10), ]
   weights[[i]] = X[,4] / sum(X[,4])
@@ -29,7 +28,7 @@ multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
 for( j in (index+1):length(gmra) ){
     
     trp <- multiscale.transport.solve( trp.lp, gmra[[index]], gmra[[j]], p = 2, nType=0, 
-                                       dType=1, w1=weights[[i]], w2=weights[[j]] )
+                                       dType=1, w1=weights[[index]], w2=weights[[j]] )
     save( trp, file = sprintf("transport-maps/transport%.3d-%.3d.Rdata", index, j) )
 }
 
