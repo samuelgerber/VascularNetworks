@@ -1,7 +1,7 @@
 library( mop )
 source( "plots.R" )
 
-load( "../Data/Bullit01/all.trees.processed.01.Rdata" )
+load( "../Data/Bullit01/all.trees.processed.02.Rdata" )
 
 X1 = all$data[[1]][,1:4]
 w1 = all$data[[1]]$v
