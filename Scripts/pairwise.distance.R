@@ -5,21 +5,20 @@ index = as.integer( args[1] )
 
 print("Doing transport on index")
 print( index )
-load("../../Data/all.trees.Rdata")
+load("../../Data/all.trees.processed.01.Rdata")
+
 gmra = vector("list", 42)
 data = vector("list", 42)
 weights = vector("list", 42)
 for( i in index:length(all$data) ){
   X = all$data[[i]][,1:4]
-  X = X[ seq(1, nrow(X), by=10), ]
-  weights[[i]] = X[,4] / sum(X[,4])
-
+  weights[[i]] = all$data[[i]]$v
   X[, 4] = X[, 4] * 100;
-  data[[i]] = X
-  
-  gmra[[i]] = gmra.create.ikm(X=X, eps=0.001, nKids=8)
+  gmra[[i]] = gmra.create.ikm(X=X, eps=0.0001, nKids=8)
 }
 
+
+dir.create("./transport-maps")
 
 trp.lp <- multiscale.transport.create.lp( oType = 26 )
 icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
