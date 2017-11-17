@@ -7,6 +7,8 @@ smooth.plain <- function(X, k=20){
 }
 
 
+
+
 smooth.weighted <- function(X, sigma = 5, k=4*sigma){
   library(RANN)
   x = nn2(X[,1:3], k=k)
@@ -20,6 +22,9 @@ smooth.weighted <- function(X, sigma = 5, k=4*sigma){
   colnames(Xnew) <- colnames(X)
   sweep(Xnew, 1, wSum, "/") 
 }
+
+
+
 
 smooth.volume <- function(X, k=40){
   library(RANN)
@@ -38,11 +43,15 @@ smooth.volume <- function(X, k=40){
 }
 
 
+
+
 subsample <- function(X, eps=0.25){
   library(gmra)
   gmra1 = gmra.create.ikm(X=X, eps=eps, nKids=8, stop=3)
   Xc = gmra.centers(gmra1, 100)
 }
+
+
 
 
 multiresolution.gmra <- function(X, n=5){
@@ -74,37 +83,44 @@ multiresolution.gmra <- function(X, n=5){
 }
 
 
+
+
 multiresolution.transport <- function( mres1, mres2 ){
  
+   #1. Compute transport map a finest scale
    trp.lp <- multiscale.transport.create.lp( )
    icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
    multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
    multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
+   trp <- multiscale.transport.solve( trp.lp, mres1$gmra[[i], gmra2, p = 2, 
+                                      nType = 0, dType = 1, w1 = w1, w2 = w2 )
    
+
+   #2. Compute decompositions
    n <- length(mres1$gmra)
-   trp <- vector("list", n )
 
-   w2 <- list()
-   X2 <- list()
+   #Store transport vector at each scale
+   forward1 = 1:length(mres1$index[[1]] )
+   forward2 = 1:length(mres1$index[[1]] )
+   delta <- vector("list", n)
    for( i in 1:n) ){
-     X2 <- gmra.centers( mres2$gmra[[i]] )
-     w2 <- mres2$X$v
-   }
+     
+     delta[[i]] = mres2$X[[i]][ forward2[ map[ ,2] ] - 
+                  mres1$X[[i]][ forward1[ map[, 1] ] , ]
 
-   gmra2 <- mres2$gmra[[ n ]]
-   for( i in length(mres1$gmra):1 ){
-     w1 = mres1$X$v
-     w2 = mres2$X$v
-     trp[[i]] <- multiscale.transport.solve( trp.lp, mres1$gmra[[i], gmra2, p = 2, 
-                                             nType=0, dType=1, w1=w1, w2=w2 )
-
-     if( i > 1){
-       cIndex = gmra.partition( gmra2, 100)
-       map = trp[[i]]$map[[ length(trp[[i]]$cost) ]]
-       for( j in (i-1):1 ){
-            
+     if( i < n ){
+       for( j in 1:length(mres1[[i+1]]$index) ){
+         forward1[ match( mres1[[i+1]]$index[j], forward1 ) ] = j
+       }
+       for( j in 1:length(mres2[[i+1]]$index) ){
+         forward2[ match( mres2[[i+1]]$index[j], forward2 ) ] = j
        }
      }
 
    }
+   for( i in 2:n){
+     delta[[i-1]] = delta[[i-1]] - delta[[i]]
+   }
+
+   list( delta = delta, trp = trp )
 }
