@@ -54,10 +54,10 @@ subsample <- function(X, eps=0.25){
 
 
 
-multiresolution.gmra <- function(X, n=5){
+multiresolution.gmra <- function(X, n=8){
   library(gmra)
-  mres <- list( gmra = list() X = list(), index = list())
-  layout( matrix(1:10, 2, 5) )
+  mres <- list( gmra = list(), X = list(), index = list())
+  layout( matrix(1:8, 2, 4) )
   for( i in 1:n){
     symbols( X, circles=X$r, inches=FALSE, bg="#00000070", 
              fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
@@ -67,10 +67,10 @@ multiresolution.gmra <- function(X, n=5){
     v = rep(0, nrow(Xnew) )
     l = rep(0, nrow(Xnew) )
     r = rep(0, nrow(Xnew) )
-    for(i in 1:length(index) ){
-      v[i] = sum( X$v[ index[[i]] ] )
-      l[i] = sum( X$l[ index[[i]] ] )
-      r[i] = sum( X$r[ index[[i]] ] * X$v[ index[[i]] ] ) / v[i]
+    for(j in 1:length(index) ){
+      v[j] = sum( X$v[ index[[j]] ] )
+      l[j] = sum( X$l[ index[[j]] ] )
+      r[j] = sum( X$r[ index[[j]] ] * X$v[ index[[j]] ] ) / v[j]
     }
     Xnew = as.data.frame( cbind(Xnew, r, l, v) )
     colnames(Xnew) <- colnames(X)[1:6]
@@ -92,35 +92,59 @@ multiresolution.transport <- function( mres1, mres2 ){
    icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
    multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
    multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
-   trp <- multiscale.transport.solve( trp.lp, mres1$gmra[[i], gmra2, p = 2, 
-                                      nType = 0, dType = 1, w1 = w1, w2 = w2 )
+   trp <- multiscale.transport.solve( 
+                                      trp.lp, 
+                                      mres1$gmra[[1]], 
+                                      mres2$gmra[[1]], 
+                                      w1 = mres1$X[[1]]$v, 
+                                      w2 = mres2$X[[1]]$v,
+                                      p = 2, 
+                                      nType = 0,
+                                      dType = 1 
+                                    )
    
 
+   
    #2. Compute decompositions
    n <- length(mres1$gmra)
+   print(n)
 
    #Store transport vector at each scale
+   map <- trp$map[[ length(trp$map) ]] 
+   print( summary(map) )
    forward1 = 1:length(mres1$index[[1]] )
-   forward2 = 1:length(mres1$index[[1]] )
+   forward2 = 1:length(mres2$index[[1]] )
    delta <- vector("list", n)
-   for( i in 1:n) ){
-     
-     delta[[i]] = mres2$X[[i]][ forward2[ map[ ,2] ] - 
-                  mres1$X[[i]][ forward1[ map[, 1] ] , ]
+   for( i in 1:n ){
+     print( i )
+     delta[[i]] = mres2$X[[i]][ forward2[ map[ ,2] ] , ] - 
+                  mres1$X[[i]][ forward1[ map[ ,1] ] , ]
 
      if( i < n ){
-       for( j in 1:length(mres1[[i+1]]$index) ){
-         forward1[ match( mres1[[i+1]]$index[j], forward1 ) ] = j
+       partition = mres1$index[[i+1]]
+       for( j in 1:length( partition ) ){
+         forward1[ which( forward1 %in% partition[[j]] ) ] = j
        }
-       for( j in 1:length(mres2[[i+1]]$index) ){
-         forward2[ match( mres2[[i+1]]$index[j], forward2 ) ] = j
+       partition = mres2$index[[i+1]]
+       for( j in 1:length( partition ) ){
+         forward2[ which( forward2 %in% partition[[j]] ) ] = j
        }
      }
 
+     print( summary( delta[[i]] ) )
    }
-   for( i in 2:n){
-     delta[[i-1]] = delta[[i-1]] - delta[[i]]
-   }
+   #for( i in 2:n){
+   #  delta[[i-1]] = delta[[i-1]] - delta[[i]]
+   #}
 
    list( delta = delta, trp = trp )
+}
+
+
+multiresolution.transport.interpolate <- function( mtrp, t, scale ){
+  ntrp = length(mtrp$trp$from) 
+  X    = mtrp$trp$from[[ ntrp ]]
+  map  = mtrp$trp$map[[ ntrp ]] 
+  
+  X[ map[, 1], ] + t * mtrp$delta[[ scale ]]
 }
