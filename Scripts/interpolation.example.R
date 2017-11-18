@@ -20,7 +20,7 @@ icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1,
 multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
 multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
 t <- system.time( trp <- multiscale.transport.solve( trp.lp, gmra1, gmra2, p = 2, nType=0, 
-                                       dType=3, w1=w1, w2=w2 ) )
+                                       dType=1, w1=w1, w2=w2 ) )
 
 print(t)
 
