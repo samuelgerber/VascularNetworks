@@ -59,10 +59,8 @@ multiresolution.gmra <- function(X, n=8){
   mres <- list( gmra = list(), X = list(), index = list())
   layout( matrix(1:8, 2, 4) )
   for( i in 1:n){
-    symbols( X, circles=X$r, inches=FALSE, bg="#00000070", 
-             fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
     mres$gmra[[i]] <-  gmra.create.ikm( X[,1:3], nKids=4, eps=0.3, stop=3)
-    Xnew <- gmra.centers( mres$gmra[[i]], 1000 )
+    Xnew <- gmra.centers( mres$gmra[[i]], 1000 )[, 1:3]
     index = gmra.partition( mres$gmra[[i]], 1000)
     v = rep(0, nrow(Xnew) )
     l = rep(0, nrow(Xnew) )
@@ -76,6 +74,8 @@ multiresolution.gmra <- function(X, n=8){
     colnames(Xnew) <- colnames(X)[1:6]
     mres$X[[i]] = Xnew
     mres$index[[i]] = index
+    symbols( Xnew, circles=Xnew$r, inches=FALSE, bg="#00000070", 
+             fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
 
     X <- smooth.weighted(Xnew, 2^i, k=40)
   }
