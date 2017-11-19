@@ -13,3 +13,8 @@ The scripts require:
 
 Optimal transport interpolation between to vascular networks:
 ![Alt text](/Scripts/ip.gif "Simple optimal transport interpolation between to brain vasacular networks")
+
+### Multiresolution optinal transport
+
+Optimal transport interpolation between to vascular networks using a multiresoultion approach:
+![Alt text](/Scripts/mv2ip.gif "Multiresolution optimal transport interpolation between to brain vasacular networks")
