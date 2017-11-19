@@ -4,7 +4,7 @@ library(mop)
 
 plot.interpolation.2d <- function(trp1, radius.scaling ){
   index = 0
-  for( t in c( seq(0, 1, by=0.01), seq(1, 0, by=-0.01) ) ){ 
+  for( t in c( seq(0, 1, by=0.05), seq(1, 0, by=-0.05) ) ){ 
     X = multiscale.transport.interpolate(trp1, length(trp1$map), t=t)
     #plot(NA, xlim=range(X$X[,1]), ylim=range(X$X[,2]), 
     #     bty="n", xlab="", ylab="", axes=FALSE)
@@ -23,7 +23,7 @@ plot.interpolation.3d <- function(trp1, radius.scaling){
 
   library(rgl)
 
-  ts = c( seq(0, 1, by=0.01), seq(1, 0, by=-0.01) )
+  ts = c( seq(0, 1, by=0.05), seq(1, 0, by=-0.05) )
   ts = rep(ts, 6)
   n=length(ts)
   for( i in 1:n ){ 
@@ -40,5 +40,7 @@ plot.interpolation.3d <- function(trp1, radius.scaling){
 
 #imagemagick gif command
 # convert -dispose previous -delay 5 -alpha remove -loop 0 ip-00*.png ip.gif
+# convert -dispose previous -delay 5 -alpha remove ip-00*.png  -reverse ip-00*.png -dispose previous -delay 5 -alpha remove -loop 0 ip.gif
+
 
 

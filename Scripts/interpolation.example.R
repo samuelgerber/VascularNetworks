@@ -12,10 +12,10 @@ w2 = all$data[[2]]$v
 X2[, 4] = X2[, 4] * 100;
 
 
-gmra1 = gmra.create.ikm(X=X1, eps=0.001, nKids=8)
-gmra2 = gmra.create.ikm(X=X2, eps=0.001, nKids=8)
+gmra1 = gmra.create.ikm(X=X1, eps=0.3, nKids=4, stop=3)
+gmra2 = gmra.create.ikm(X=X2, eps=0.3, nKids=4, stop=3)
 
-trp.lp <- multiscale.transport.create.lp( )
+trp.lp <- multiscale.transport.create.lp(26 )
 icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
 multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
 multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
