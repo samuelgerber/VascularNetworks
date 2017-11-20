@@ -12,9 +12,14 @@ The scripts require:
   * Processed tree data is availabe in the Data folder of the repository (scripts need to be adapated to find the data)
 
 Optimal transport interpolation between to vascular networks:
+
 ![Alt text](/Scripts/ip.gif "Simple optimal transport interpolation between to brain vasacular networks")
 
 ### Multiresolution optinal transport
+Decompoition of vascular network into a multiresolution representation:
+
+![Alt text](/Scripts/multiresolution.png "Multiresolution decomposition of vascular network")
 
 Optimal transport interpolation between to vascular networks using a multiresoultion approach:
+
 ![Alt text](/Scripts/mv2ip.gif "Multiresolution optimal transport interpolation between to brain vasacular networks")
