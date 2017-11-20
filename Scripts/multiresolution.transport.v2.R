@@ -2,14 +2,17 @@
 # Transport across scales within each subject
 # transport across subjects at coarsest scale
 
-multiresolution.transport.v2 <- function( mres1, mres2 ){
+multiresolution.transport.v2 <- function( mres1, mres2, trp.lp = NULL ){
    library(mop)
 
    #1. Compute transport map a finest scale
-   trp.lp <- multiscale.transport.create.lp( 26 )
-   icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
-   multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
-   multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
+   if( is.null(trp.lp) ){
+     trp.lp <- multiscale.transport.create.lp( 26 )
+     icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
+     multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
+     multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
+   }
+
 
    n <- length(mres1$gmra)
    mtrp <- list( trp1 <- list(), trp2 <- list() )
@@ -74,7 +77,7 @@ multiresolution.transport.v2 <- function( mres1, mres2 ){
 
 
 
-multiscale.transport.delta <- function (mst, index, t) {
+multiscale.transport.v2.delta <- function (mst, index, t) {
     from = mst$from[[index]]
     to = mst$to[[index]]
     map = mst$map[[index]]
@@ -84,7 +87,7 @@ multiscale.transport.delta <- function (mst, index, t) {
 
 
 
-multiresolution.transport.v2.plot.interpolation <- function( mtrp, radius.scaling ){
+multiresolution.transport.v2.plot.interpolation.2d <- function( mtrp, radius.scaling ){
   
   index <- 0
   n <- length(mtrp$trp1)
@@ -111,7 +114,7 @@ multiresolution.transport.v2.plot.interpolation <- function( mtrp, radius.scalin
 
 
   trp = mtrp$trp
-  delta <- multiscale.transport.delta( trp, length( trp$cost), t=1)[,1:3]
+  delta <- multiscale.transport.v2.delta( trp, length( trp$cost), t=1)[,1:3]
   step = 5 / sqrt( max(rowSums( delta*delta) ) )
   print(step)
 

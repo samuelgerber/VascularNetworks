@@ -2,7 +2,7 @@
 # Transport finest scale and decomposition that transport plan according to teh
 # coarser scales
 
-multiresolution.transport <- function( mres1, mres2, trp.lp = NULL ){
+multiresolution.transport.v1 <- function( mres1, mres2, trp.lp = NULL ){
    library(mop)
 
    #1. Compute transport map a finest scale
@@ -87,17 +87,9 @@ multiresolution.transport <- function( mres1, mres2, trp.lp = NULL ){
 
 
 
-multiresolution.transport.interpolate <- function( mtrp, t ){
-  X    = mtrp$from
-  for(i in 1:length(mtrp$delta) ){
-    X = X + t * mtrp$delta[[ i ]]
-  }
-  X
-}
 
 
-
-multiresolution.transport.interpolate.scale.from <- function( mtrp, t, scale ){
+multiresolution.transport.v1.interpolate.scale.from <- function( mtrp, t, scale ){
   ntrp = length( mtrp$delta ) 
   X    = mtrp$from
   if(scale > 1){
@@ -110,7 +102,7 @@ multiresolution.transport.interpolate.scale.from <- function( mtrp, t, scale ){
 }
 
 
-multiresolution.transport.interpolate.scale.to <- function( mtrp, t, scale ){
+multiresolution.transport.v1.interpolate.scale.to <- function( mtrp, t, scale ){
   ntrp = length( mtrp$delta ) 
   X    = mtrp$to
   if(scale > 1){
@@ -124,7 +116,7 @@ multiresolution.transport.interpolate.scale.to <- function( mtrp, t, scale ){
 
 
 
-multiresolution.transport.interpolate.scale.from.v2 <- function( mtrp, t){
+multiresolution.transport.v1.interpolate.scale.from.v2 <- function( mtrp, t){
   ntrp = length( mtrp$delta ) 
   X    = mtrp$from
   if( t<0 ){
@@ -139,7 +131,7 @@ multiresolution.transport.interpolate.scale.from.v2 <- function( mtrp, t){
 
 
 
-multiresolution.transport.interpolate.scale.to.v2 <- function( mtrp, t){
+multiresolution.transport.v1.interpolate.scale.to.v2 <- function( mtrp, t){
   ntrp = length( mtrp$delta ) 
   X    = mtrp$to
   if( t<0 ){
@@ -154,7 +146,7 @@ multiresolution.transport.interpolate.scale.to.v2 <- function( mtrp, t){
 
 
 
-multiresolution.plot.interpolation.2d <- function(mtrp, radius.scaling ){
+multiresolution.transort.v1.plot.interpolation.2d <- function(mtrp, radius.scaling ){
   index = 0
 
   for( s in 1:length(mtrp$delta) ){
@@ -162,7 +154,7 @@ multiresolution.plot.interpolation.2d <- function(mtrp, radius.scaling ){
     print(step)
   #step=0.05
     for( t in seq(0, 1, length.out=1/step)  ){ 
-      X = multiresolution.transport.interpolate.scale.from( mtrp, t=t, s)
+      X = multiresolution.transport.v1.interpolate.scale.from( mtrp, t=t, s)
       X$r[X$r<0] = 0
       print(summary(X$r))
       symbols( X$x, X$y, circles=X$r*radius.scaling, inches=FALSE, bg="#00000010", 
@@ -177,7 +169,7 @@ multiresolution.plot.interpolation.2d <- function(mtrp, radius.scaling ){
     step = 5 / sqrt( max(mtrp$delta[[s]][, .(x^2+y^2+z^2)] ) )
     print(step)
     for( t in seq(0, 1, length.out=1/step) ){ 
-      X = multiresolution.transport.interpolate.scale.to( mtrp, t=t, s)
+      X = multiresolution.transport.v1.interpolate.scale.to( mtrp, t=t, s)
       X$r[X$r<0] = 0
       symbols( X$x, X$y, circles=X$r*radius.scaling, inches=FALSE, bg="#00000010", 
                fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
