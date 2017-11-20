@@ -11,7 +11,6 @@ smooth.plain <- function(X, k=20){
 
 smooth.weighted <- function(X, volume, sigma = 5, k=4*sigma){
   library(RANN)
-  print(summary(X))
   nn = nn2(X, k=k)
   w = exp( -nn$nn.dists / (2*sigma*sigma) )
   wSum = 0
@@ -36,16 +35,17 @@ subsample <- function(X, eps=0.25){
 
 
 
-multiresolution.gmra <- function(X, n=8){
+multiresolution.gmra <- function(X, n=8, show=FALSE){
   library(gmra)
   library(data.table)
 
 
   mres <- list( gmra = list(), X = list(), index = list(), partition = list(), Xin=X )
   #layout( matrix(1:8, 2, 4) )
-  par(mar = c(0,0,0,0) )
-  par( mfrow = c(2,4) )
-
+  if(show){
+    par(mar = c(0,0,0,0) )
+    par( mfrow = c(2,4) )
+  }
   npoints = nrow(X)
   for( i in 1:n){
     X <-  as.data.table(X)
@@ -70,9 +70,11 @@ multiresolution.gmra <- function(X, n=8){
     mres$X[[i]]     = Y
     mres$index[[i]] = index
 
-    col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/length(index)) ) )
-    symbols( Y$x, Y$y, circles=1.5*Y$r, inches=FALSE, bg=col, 
+    if(show){
+      col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/length(index)) ) )
+      symbols( Y$x, Y$y, circles=1.5*Y$r, inches=FALSE, bg=col, 
              fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
+    }
       
     if( i<n){
       X <- smooth.weighted(Y[ ,c("x", "y", "z", "r")], Y$v, 2^i, k=40)

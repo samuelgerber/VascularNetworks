@@ -2,14 +2,16 @@
 # Transport finest scale and decomposition that transport plan according to teh
 # coarser scales
 
-multiresolution.transport <- function( mres1, mres2 ){
+multiresolution.transport <- function( mres1, mres2, trp.lp = NULL ){
    library(mop)
 
    #1. Compute transport map a finest scale
-   trp.lp <- multiscale.transport.create.lp( )
-   icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
-   multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
-   multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
+   if( is.null(trp.lp)){
+     trp.lp <- multiscale.transport.create.lp( 26 )
+     icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
+     multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
+     multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
+   }
    trp <- multiscale.transport.solve( 
                                       trp.lp, 
                                       mres1$gmra[[1]], 
@@ -25,7 +27,6 @@ multiresolution.transport <- function( mres1, mres2 ){
    
    #2. Compute decompositions
    n <- length(mres1$gmra)
-   print(n)
 
    #Store transport vector at each scale
    ntrp <- length(trp$map)
@@ -35,21 +36,26 @@ multiresolution.transport <- function( mres1, mres2 ){
    # transport map indices do not match up with gmra input 
    from = rep(0, length(trp$fromSize[[ ntrp ]] ) )
    to = rep(0, length(trp$toSize[[ ntrp ]] ) )
-   from[  rep( 1:length( trp$fromSize[[ntrp]] ) , trp$fromSize[[ntrp]] ) ] = trp$fromIndex[[ ntrp ]]
+
+   fromSizes = rep( 1:length( trp$fromSize[[ntrp]] ) , trp$fromSize[[ntrp]] ) 
+   from[ fromSizes ] = trp$fromIndex[[ ntrp ]]
    from = from[ map[,1] ] 
-   to[    rep( 1:length( trp$toSize[[ntrp]] )   , trp$toSize[[ntrp]] ) ]   = trp$toIndex[[ ntrp ]]
+
+   toSizes = rep( 1:length( trp$toSize[[ntrp]] )   , trp$toSize[[ntrp]] ) 
+   to[ toSizes ]   = trp$toIndex[[ ntrp ]]
    to = to[ map[,2] ]
 
-   delta <- vector("list", n)
+   #convert mass to  index
+   #mass = map[ trp$fromIndex[[ ntrp ]][ map[,1] , 3]
    
    #map transport plan forwrad to data at each scale
    forward1 = 1:length( trp$fromIndex[[ntrp]] )
    forward2 = 1:length( trp$toIndex[[ntrp]] )
-
+   
+   delta <- vector("list", n)
    for( i in 1:n ){
-     print( i )
 
-     #upatde forward map to current scale
+     #upated forward map to current scale
      forward1  = mres1$partition[[i]][ forward1 ]
      #partition = rep( 1:length(mres2$index[[i]]), sapply(mres2$index[[i]], length) )
      #partition[ unlist( mres2$index[[i]] ) ] = partition
@@ -65,7 +71,7 @@ multiresolution.transport <- function( mres1, mres2 ){
      delta[[i]] = mres2$X[[i]][ forward2[ to ], ] - 
                   mres1$X[[i]][ forward1[ from ],   ]
 
-     print( summary( delta[[i]] ) )
+     #print( summary( delta[[i]] ) )
    }
 
    #store tarnsport plan differences at each scale
@@ -73,7 +79,7 @@ multiresolution.transport <- function( mres1, mres2 ){
      delta[[i-1]] = delta[[i-1]] - delta[[i]]
    }
 
-   list( delta = delta, trp = trp, from = X1, to=X2 )
+   list( delta = delta, trp = trp, from = X1, to=X2, mass=map[,3] )
 }
 
 

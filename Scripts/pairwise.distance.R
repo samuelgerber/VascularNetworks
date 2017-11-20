@@ -5,10 +5,9 @@ index = as.integer( args[1] )
 
 print("Doing transport on index")
 print( index )
-load("../../Data/all.trees.processed.01.Rdata")
+load("../../Code/Data/Bullit01/all.trees.processed.01.Rdata")
 
 gmra = vector("list", 42)
-data = vector("list", 42)
 weights = vector("list", 42)
 for( i in index:length(all$data) ){
   X = all$data[[i]][,1:4]
@@ -31,5 +30,5 @@ for( j in (index+1):length(gmra) ){
     save( trp, file = sprintf("transport-maps/transport%.3d-%.3d.Rdata", index, j) )
 }
 
-
-
+# Shell command:
+# printf %s\\n {1..41} | xargs -t -n1 -P8 -I{} RScript pairwise.distance.R {}
