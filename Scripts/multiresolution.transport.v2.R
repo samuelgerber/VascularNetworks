@@ -94,9 +94,12 @@ multiresolution.transport.v2.plot.interpolation <- function( mtrp, radius.scalin
     step = 5 / sqrt( max(rowSums( delta*delta) ) )
     print(step)
 
+    npoints = length(mtrp$trp1[[1]]$fromSize[[ length(mtrp$trp1[[1]]$fromSize) ]] )
+    npoints2 = length(mtrp$trp1[[i]]$fromSize[[ length(mtrp$trp1[[i]]$fromSize) ]] )
+    col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/npoints2 ) ) )
     for( t in seq(0, 1, by=step)  ){ 
       X = multiscale.transport.interpolate( trp, length(trp$cost), t=t )
-      symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg="#00000010", 
+      symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg=col, 
                fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
       dev.copy( png, sprintf( "mv2ip-%.5d.png", index) )
       dev.off()
@@ -112,9 +115,13 @@ multiresolution.transport.v2.plot.interpolation <- function( mtrp, radius.scalin
   step = 5 / sqrt( max(rowSums( delta*delta) ) )
   print(step)
 
+  npoints = length(mtrp$trp1[[1]]$fromSize[[ length(mtrp$trp1[[1]]$fromSize) ]] )
+  npoints2 = length(mtrp$trp$fromSize[[ length(mtrp$trp$fromSize) ]] )
+  col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/npoints2 ) ) )
+
   for( t in seq(0, 1, by=step)  ){ 
     X = multiscale.transport.interpolate( trp, length(trp$cost), t=t )
-    symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg="#00000010", 
+    symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg=col, 
                fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
     dev.copy( png, sprintf( "mv2ip-%.5d.png", index) )
     dev.off()
@@ -130,9 +137,13 @@ multiresolution.transport.v2.plot.interpolation <- function( mtrp, radius.scalin
     step = 5 / sqrt( max(rowSums( delta*delta) ) )
     print(step)
 
-    for( t in seq(1, 0, by=-step)  ){ 
+    npoints = length(mtrp$trp2[[1]]$fromSize[[ length(mtrp$trp2[[1]]$fromSize) ]] )
+    npoints2 = length(mtrp$trp2[[i]]$fromSize[[ length(mtrp$trp2[[i]]$fromSize) ]] )
+    col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/npoints2 ) ) )
+
+    for( t in c(seq(1, 0, by=-step),0)  ){ 
       X = multiscale.transport.interpolate( trp, length(trp$cost), t=t )
-      symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg="#00000010", 
+      symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg=col, 
                fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
       dev.copy( png, sprintf( "mv2ip-%.5d.png", index) )
       dev.off()
