@@ -97,7 +97,7 @@ multiresolution.transport.v2.plot.interpolation <- function( mtrp, radius.scalin
     npoints = length(mtrp$trp1[[1]]$fromSize[[ length(mtrp$trp1[[1]]$fromSize) ]] )
     npoints2 = length(mtrp$trp1[[i]]$fromSize[[ length(mtrp$trp1[[i]]$fromSize) ]] )
     col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/npoints2 ) ) )
-    for( t in seq(0, 1, by=step)  ){ 
+    for( t in seq(0, 1, length.out=1/step)  ){ 
       X = multiscale.transport.interpolate( trp, length(trp$cost), t=t )
       symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg=col, 
                fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
@@ -119,7 +119,7 @@ multiresolution.transport.v2.plot.interpolation <- function( mtrp, radius.scalin
   npoints2 = length(mtrp$trp$fromSize[[ length(mtrp$trp$fromSize) ]] )
   col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/npoints2 ) ) )
 
-  for( t in seq(0, 1, by=step)  ){ 
+  for( t in seq(0, 1, length.out=1/step)  ){ 
     X = multiscale.transport.interpolate( trp, length(trp$cost), t=t )
     symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg=col, 
                fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
@@ -141,7 +141,7 @@ multiresolution.transport.v2.plot.interpolation <- function( mtrp, radius.scalin
     npoints2 = length(mtrp$trp2[[i]]$fromSize[[ length(mtrp$trp2[[i]]$fromSize) ]] )
     col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/npoints2 ) ) )
 
-    for( t in c(seq(1, 0, by=-step),0)  ){ 
+    for( t in seq(1, 0, length.out= 1/step)  ){ 
       X = multiscale.transport.interpolate( trp, length(trp$cost), t=t )
       symbols( X$X, circles=X$X[,4] * radius.scaling, inches=FALSE, bg=col, 
                fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
