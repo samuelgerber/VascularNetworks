@@ -24,7 +24,7 @@ Optimal transport interpolation between to vascular networks:
 
 ![Alt text](/Scripts/ip.gif "Simple optimal transport interpolation between to brain vasacular networks")
 
-### Multiresolution optinal transport
+### Multiresolution Optimal Transport
 Decompoition of vascular network into a multiresolution representation:
 
 ![Alt text](/Scripts/multiresolution.png "Multiresolution decomposition of vascular network")
