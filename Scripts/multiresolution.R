@@ -42,7 +42,11 @@ multiresolution.gmra <- function(X, n=8){
 
 
   mres <- list( gmra = list(), X = list(), index = list(), partition = list(), Xin=X )
-  layout( matrix(1:8, 2, 4) )
+  #layout( matrix(1:8, 2, 4) )
+  par(mar = c(0,0,0,0) )
+  par( mfrow = c(2,4) )
+
+  npoints = nrow(X)
   for( i in 1:n){
     X <-  as.data.table(X)
     mres$gmra[[i]] <-  gmra.create.ikm( X[, .(x, y, z, r)], nKids=4, eps=0.3, stop=3)
@@ -66,7 +70,8 @@ multiresolution.gmra <- function(X, n=8){
     mres$X[[i]]     = Y
     mres$index[[i]] = index
 
-    symbols( Y$x, Y$y, circles=Y$r, inches=0.02, bg="#00000070", 
+    col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/length(index)) ) )
+    symbols( Y$x, Y$y, circles=1.5*Y$r, inches=FALSE, bg=col, 
              fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
       
     if( i<n){
