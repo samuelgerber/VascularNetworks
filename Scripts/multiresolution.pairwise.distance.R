@@ -15,6 +15,7 @@ for( i in index:length(all$data) ){
 }
 
 
+
 dir.create("./transport-maps")
 
 trp.lp <- multiscale.transport.create.lp( )
@@ -22,7 +23,7 @@ icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1,
 multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
 multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
 for( j in (index+1):length(mres) ){
-    mtrp <- multiresolution.transport( mres[[index], mres[[j]], trp.lp )
+    mtrp <- multiresolution.transport( mres[[index]], mres[[j]], trp.lp )
     save( mtrp, file = sprintf("transport-maps/transport%.3d-%.3d.Rdata", index, j) )
 }
 

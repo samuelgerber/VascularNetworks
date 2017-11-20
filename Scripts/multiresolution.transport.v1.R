@@ -84,6 +84,9 @@ multiresolution.transport <- function( mres1, mres2, trp.lp = NULL ){
 
 
 
+
+
+
 multiresolution.transport.interpolate <- function( mtrp, t ){
   X    = mtrp$from
   for(i in 1:length(mtrp$delta) ){
@@ -97,14 +100,29 @@ multiresolution.transport.interpolate <- function( mtrp, t ){
 multiresolution.transport.interpolate.scale.from <- function( mtrp, t, scale ){
   ntrp = length( mtrp$delta ) 
   X    = mtrp$from
-  if(scale < ntrp){
-    for(i in ntrp:(scale+1) ){
+  if(scale > 1){
+    for(i in 1:(scale-1) ){
       X = X + mtrp$delta[[ i ]]
     }
   }
   X = X + t*mtrp$delta[[ scale ]]
   X
 }
+
+
+multiresolution.transport.interpolate.scale.to <- function( mtrp, t, scale ){
+  ntrp = length( mtrp$delta ) 
+  X    = mtrp$to
+  if(scale > 1){
+    for(i in 1:(scale-1) ){
+      X = X - mtrp$delta[[ i ]]
+    }
+  }
+  X = X - t*mtrp$delta[[ scale ]]
+  X
+}
+
+
 
 multiresolution.transport.interpolate.scale.from.v2 <- function( mtrp, t){
   ntrp = length( mtrp$delta ) 
@@ -139,12 +157,12 @@ multiresolution.transport.interpolate.scale.to.v2 <- function( mtrp, t){
 multiresolution.plot.interpolation.2d <- function(mtrp, radius.scaling ){
   index = 0
 
-  #for( s in length(mtrp$delta):1 ){
-  #  step = 5 / sqrt( max(mtrp$delta[[s]][, .(x^2+y^2+z^2)] ) )
-  #  print(step)
-  step=0.05
-    for( t in seq(0, 1, by=step)  ){ 
-      X = multiresolution.transport.interpolate.scale.from.v2( mtrp, t=t)
+  for( s in 1:length(mtrp$delta) ){
+    step = 5 / sqrt( max(mtrp$delta[[s]][, .(x^2+y^2+z^2)] ) )
+    print(step)
+  #step=0.05
+    for( t in seq(0, 1, length.out=1/step)  ){ 
+      X = multiresolution.transport.interpolate.scale.from( mtrp, t=t, s)
       X$r[X$r<0] = 0
       print(summary(X$r))
       symbols( X$x, X$y, circles=X$r*radius.scaling, inches=FALSE, bg="#00000010", 
@@ -153,13 +171,13 @@ multiresolution.plot.interpolation.2d <- function(mtrp, radius.scaling ){
       dev.off()
       index = index +1
     }
- # }
+  }
 
-  #for( s in length(mtrp$delta):1 ){
-  #  step = 5 / sqrt( max(mtrp$delta[[s]][, .(x^2+y^2+z^2)] ) )
-  #  print(step)
-    for( t in seq(0, 1, by=step) ){ 
-      X = multiresolution.transport.interpolate.scale.to.v2( mtrp, t=t)
+  for( s in 1:length(mtrp$delta) ){
+    step = 5 / sqrt( max(mtrp$delta[[s]][, .(x^2+y^2+z^2)] ) )
+    print(step)
+    for( t in seq(0, 1, length.out=1/step) ){ 
+      X = multiresolution.transport.interpolate.scale.to( mtrp, t=t, s)
       X$r[X$r<0] = 0
       symbols( X$x, X$y, circles=X$r*radius.scaling, inches=FALSE, bg="#00000010", 
                fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
@@ -167,7 +185,7 @@ multiresolution.plot.interpolation.2d <- function(mtrp, radius.scaling ){
       dev.off()
       index = index +1
     }
- # }
+  }
 
  # symbols( mtrp$from$x,mtrp$from$y, circles=mtrp$from$r*radius.scaling, inches=FALSE, bg="#00000010", 
   #             fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")

@@ -29,6 +29,14 @@ Decompoition of vascular network into a multiresolution representation:
 
 ![Alt text](/Scripts/multiresolution.png "Multiresolution decomposition of vascular network")
 
-Optimal transport interpolation between to vascular networks using a multiresoultion approach:
+Optimal transport interpolation between to vascular networks using multiresoultion approach 1:
+Transport among scales within subject and map to different subject at coarsest scale.
 
 ![Alt text](/Scripts/mv2ip.gif "Multiresolution optimal transport interpolation between to brain vasacular networks")
+
+
+
+Optimal transport interpolation between to vascular networks using multiresoultion approach o2:
+Transport between subject at finest scale, decompose transport plan according to multiresolution representation of the two subjects.
+
+![Alt text](/Scripts/mip.gif "Multiresolution optimal transport interpolation between to brain vasacular networks")
