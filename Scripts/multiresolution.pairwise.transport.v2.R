@@ -22,7 +22,7 @@ trp.lp <- multiscale.transport.create.lp( 26 )
 icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
 multiscale.transport.set.propagation.strategy.1( trp.lp, icprop )
 multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
-for( j in (index+1):length(mres) ){
+for( j in (index+1):length( mres) ){
     mtrp <- multiresolution.transport.v2( mres[[index]], mres[[j]], trp.lp )
     save( mtrp, file = sprintf("transport-maps/transport%.3d-%.3d.Rdata", index, j) )
 }

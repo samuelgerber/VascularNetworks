@@ -35,16 +35,18 @@ subsample <- function(X, eps=0.25){
 
 
 
-multiresolution.gmra <- function(X, n=8, show=FALSE){
+multiresolution.gmra <- function(X, n=8, show=FALSE, radius.scaling=1){
   library(gmra)
   library(data.table)
 
+  xr = range(X$x)
+  yr = range(X$y)
 
   mres <- list( gmra = list(), X = list(), index = list(), partition = list(), Xin=X )
   #layout( matrix(1:8, 2, 4) )
   if(show){
-    par(mar = c(0,0,0,0) )
-    par( mfrow = c(2,4) )
+    par(mar = c(1,1,1,1) )
+    par( mfrow = c(2,ceiling(n/2)) )
   }
   npoints = nrow(X)
   for( i in 1:n){
@@ -72,8 +74,8 @@ multiresolution.gmra <- function(X, n=8, show=FALSE){
 
     if(show){
       col = rgb(0,0,0, min(1, 0.075 * sqrt( npoints/length(index)) ) )
-      symbols( Y$x, Y$y, circles=1.5*Y$r, inches=FALSE, bg=col, 
-             fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
+      symbols( Y$x, Y$y, circles=1.5*Y$r*radius.scaling, inches=FALSE, bg=col, 
+             fg="#00000000", bty="n", xlab="", ylab="", xlim=xr, ylim=yr ) 
     }
       
     if( i<n){

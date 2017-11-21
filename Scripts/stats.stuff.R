@@ -1,4 +1,4 @@
-source("transport.distances.R")
+source("pairwise.distances.R")
 
 library(kernlab)
 library(caret)
@@ -8,7 +8,7 @@ load( "../../Data/normal-database-tree-only.Rdata" )
 #load("../../Data/all.trees.Rdata")
 
 distances = load.transport.distances( 
-  "../../Processed/Transport05/transport-maps/", 42 )
+  "../../Processed/Transport04/transport-maps/", 42 )
 
 
 # a few plots
@@ -37,6 +37,12 @@ for(i in 1:20){
   resLM <- rbind(resLM, lmCV$result)
 
 }
+
+tg <- expand.grid(alpha = 1, lambda = seq(10, 0, length.out=10)^2)
+trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 50)
+
+  glmnet1 <- train(gender ~., data = data1, method = "glmnet", trControl=trctrl, tuneGrid=tg)
+  glmnet2 <- train(age ~., data = data2, method = "glmnet", trControl=trctrl, tuneGrid=tg)
 
 #old stuff
 
