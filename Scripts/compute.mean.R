@@ -10,17 +10,32 @@ n.subjects = length(all$data)
 gmra = vector("list", n.subjects)
 weights = vector("list", n.subjects)
 radius.scaling = 100
+X.mean = c()
+W.mean = c()
 for( i in 1:n.subjects ){
   X = all$data[[i]][,1:4]
   weights[[i]] = all$data[[i]]$v
   X[, 4] = X[, 4] * radius.scaling
   colnames(X) <- c("x", "y", "z", "r")
   gmra[[i]] = gmra.create.ikm(X=X, eps=0.0001, nKids=4)
+  X.mean = rbind(X.mean, X)
+  W.mean = c(W.mean, weights[[i]] )
 }
 
-X.mean = as.data.table(X)
-W.mean = weights[[n.subjects]]
+gmra.tmp <- gmra.create.ikm(X.mean, eps=10, stop=3, nKids=4)
 
+X.mean <- as.data.table( gmra.centers(gmra.tmp, 1000) )
+partition <- gmra.partition(gmra.tmp, 1000)
+p.id <- rep(1:length(partition), sapply(partition, length) )
+dt <- data.table(p.id=p.id, w = W.mean)
+dt = dt[, .(sum(w), by=p.id)]
+
+W.mean = dt[order(p.id), ]$w
+
+colnames(X.mean) = c("x", "y", "z", "r")
+X = X.mean  
+symbols( X$x, X$y, circles=X$r/radius.scaling, inches=FALSE, bg="#00000013", 
+             fg="#00000000", bty="n", xlab="", ylab="" ) 
 
 trp.lp <- multiscale.transport.create.lp( oType = 26 )
 icprop <- multiscale.transport.create.iterated.capacity.propagation.strategy( 1, 0 )
