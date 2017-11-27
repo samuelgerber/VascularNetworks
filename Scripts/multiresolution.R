@@ -18,7 +18,8 @@ smooth.weighted <- function(X, volume, sigma = 5, k=4*sigma){
   for(i in 1:ncol(nn$nn.idx) ){ 
     wtmp = w[,i] * volume[nn$nn.idx[,i]] 
     wSum = wSum + wtmp 
-    Xnew = Xnew + X[nn$nn.idx[,i], ] * wtmp}
+    Xnew = Xnew + X[nn$nn.idx[,i], ] * wtmp
+  }
   colnames(Xnew) <- colnames(X)
   sweep(Xnew, 1, wSum, "/") 
 }

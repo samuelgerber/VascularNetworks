@@ -92,8 +92,8 @@ multiresolution.transport.v1 <- function( mres1, mres2, trp.lp = NULL ){
 multiresolution.transport.v1.interpolate.scale.from <- function( mtrp, t, scale ){
   ntrp = length( mtrp$delta ) 
   X    = mtrp$from
-  if(scale > 1){
-    for(i in 1:(scale-1) ){
+  if(scale < ntrp){
+    for(i in (scale+1):(ntrp-1) ){
       X = X + mtrp$delta[[ i ]]
     }
   }
@@ -105,8 +105,8 @@ multiresolution.transport.v1.interpolate.scale.from <- function( mtrp, t, scale 
 multiresolution.transport.v1.interpolate.scale.to <- function( mtrp, t, scale ){
   ntrp = length( mtrp$delta ) 
   X    = mtrp$to
-  if(scale > 1){
-    for(i in 1:(scale-1) ){
+  if(scale < ntrp){
+    for(i in (scale+1):ntrp ){
       X = X - mtrp$delta[[ i ]]
     }
   }
@@ -146,10 +146,10 @@ multiresolution.transport.v1.interpolate.scale.to.v2 <- function( mtrp, t){
 
 
 
-multiresolution.transort.v1.plot.interpolation.2d <- function(mtrp, radius.scaling ){
+multiresolution.transport.v1.plot.interpolation.2d <- function(mtrp, radius.scaling ){
   index = 0
 
-  for( s in 1:length(mtrp$delta) ){
+  for( s in length(mtrp$delta):1 ){
     step = 5 / sqrt( max(mtrp$delta[[s]][, .(x^2+y^2+z^2)] ) )
     print(step)
   #step=0.05
@@ -165,7 +165,7 @@ multiresolution.transort.v1.plot.interpolation.2d <- function(mtrp, radius.scali
     }
   }
 
-  for( s in 1:length(mtrp$delta) ){
+  for( s in length(mtrp$delta):1 ){
     step = 5 / sqrt( max(mtrp$delta[[s]][, .(x^2+y^2+z^2)] ) )
     print(step)
     for( t in seq(0, 1, length.out=1/step) ){ 

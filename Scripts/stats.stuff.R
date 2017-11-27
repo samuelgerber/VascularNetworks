@@ -8,7 +8,7 @@ load( "../../Data/normal-database-tree-only.Rdata" )
 #load("../../Data/all.trees.Rdata")
 
 distances = load.transport.distances( 
-  "../../Processed/Transport04/transport-maps/", 42 )
+  "../../Processed/Transport06/transport-maps/", 42 )
 
 
 # a few plots
