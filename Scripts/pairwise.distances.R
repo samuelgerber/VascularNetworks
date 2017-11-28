@@ -27,6 +27,7 @@ load.transport.distances.partitioned <- function( folder,
     for( j in 1:n.partitions){
       distances[[i]][[j]] = matrix(0, nrow=n.subjects, ncol=n.subjects)
     }
+    #distances[[i]] = matrix(0, nrow=n.subjects, ncol=n.subjects)
   }
   for( i in 1:(n.subjects-1) ){
     for( j in (i+1):n.subjects){
@@ -36,16 +37,29 @@ load.transport.distances.partitioned <- function( folder,
       map = trp$map[[n]]
       partition.from = partition.function( trp$from[[n]] )
       partition.to = partition.function( trp$to[[n]] )
-      p.from <- unique( partition.from )
-      p.to <- unique( partition.to )
-      for( k1 in p.from ){
-        for( k2 in p.to ){
-          k.from = partition.from == k1 | partition.from == k2
-          k.to   = partition.to   == k2 | partition.to   == k1
+      p.from <- max( partition.from )
+      p.to <- max( partition.to )
+      for( k1 in 1:n.partitions ){
+        for( k2 in 1:p.to ){
+          k.from = partition.from == k1 
+          k.to   = partition.to   == k2 
           index  = which( k.from[ map[,1] ] & k.to[ map[,2] ] )
-          dtmp = sum( map[index, 3] * map[index, 4] )
-          distances[[k1]][[k2]][i, j] =  dtmp^(1/p)
-          distances[[k1]][[k2]][j, i] =  dtmp^(1/p)
+          #k.from = partition.from == k2 
+          #k.to   = partition.to   == k1 
+          #index2  = which( k.from[ map[,1] ] & k.to[ map[,2] ] )
+          #index <- unique( c(index1, index2) )
+          #dtmp1 = sum( map[index1, 3] * map[index1, 4] )^(1/p)
+          #dtmp2 = sum( map[index2, 3] * map[index2, 4] )^(1/p)
+          #dtmp  = (dtmp1 + dtmp2)/2
+          if(length(index) > 0 ){
+            dtmp = sum( (map[index, 3] * map[index, 4]) )^(1/p) /sum(map[index, 4])
+            distances[[k1]][[k2]][i, j] =  dtmp
+            distances[[k1]][[k2]][j, i] =  dtmp
+          }
+          #distances[[k1]][[k2]][i, j] =  distances[[k1]][[k2]][i, j] + dtmp
+          #distances[[k1]][[k2]][j, i] =  distances[[k1]][[k2]][j, i] + dtmp
+          #distances[[k2]][[k1]][i, j] =  distances[[k2]][[k1]][i, j] + dtmp
+          #distances[[k2]][[k1]][j, i] =  distances[[k2]][[k1]][j, i] + dtmp
         }
       }
     }

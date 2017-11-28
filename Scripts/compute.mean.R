@@ -22,7 +22,7 @@ for( i in 1:n.subjects ){
   W.mean = c(W.mean, weights[[i]] )
 }
 
-gmra.tmp <- gmra.create.ikm(X.mean, eps=10, stop=3, nKids=4)
+gmra.tmp <- gmra.create.ikm(X.mean, eps=20, stop=3, nKids=4)
 
 X.mean <- as.data.table( gmra.centers(gmra.tmp, 1000) )
 partition <- gmra.partition(gmra.tmp, 1000)
