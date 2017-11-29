@@ -22,7 +22,7 @@ for( i in 1:n.subjects ){
   W.mean = c(W.mean, weights[[i]] )
 }
 
-gmra.tmp <- gmra.create.ikm(X.mean, eps=20, stop=3, nKids=4)
+gmra.tmp <- gmra.create.ikm(X.mean, eps=25, stop=3, nKids=4)
 
 X.mean <- as.data.table( gmra.centers(gmra.tmp, 1000) )
 partition <- gmra.partition(gmra.tmp, 1000)
@@ -44,19 +44,25 @@ multiscale.transport.add.expand.neighborhood.strategy(trp.lp, 1 )
 
 step = 1
 
-for(n in 1:40){
+X.progress = list()
+X.progress[[1]] = X.mean
+costs <- list()
+for(iter in 1:40){
   gmra.mean = gmra.create.ikm(X=X.mean, eps=5, nKids=4, stop=3)
 
   X.update = as.data.table( matrix(0, nrow = nrow(X.mean), ncol = ncol(X.mean) ) )
   mass.update = rep(0, nrow(X.mean) )
   colnames(X.update) = colnames(X.mean)
+  sum.cost = 0
   for( j in 1:length(gmra) ){
     
     trp <- multiscale.transport.solve( trp.lp, gmra.mean, gmra[[j]], p = 2, nType=0, 
                                        dType=1, w1=W.mean, w2=weights[[j]] )
     n = length(trp$cost)
+    sum.cost = sum.cost + trp$cost[[n]]
     if(trp$cost[[n]] > 0 ){
      
+
     map = trp$map[[n]]
     from.index = trp$fromIndex[[n]]
     from.size = trp$fromSize[[n]] 
@@ -76,13 +82,16 @@ for(n in 1:40){
   }
   
   print( summary(X.update) )  
-  symbols( X$x, X$y, circles=X$r/radius.scaling, inches=FALSE, bg="#00000033", 
+  symbols( X$x, X$y, circles=X$r/radius.scaling, inches=FALSE, bg="#00000007", 
              fg="#00000000", bty="n", xlab="", ylab="" ) 
   X.mean = X.mean + step * X.update / n.subjects
   X.mean$r[X.mean$r<0] = 0
-  W.mean = mass.update / n.subjects
-  
-  symbols( X.mean$x, X.mean$y, circles=X.mean$r/radius.scaling, inches=FALSE, bg="#FF000033", 
+  #W.mean = mass.update / n.subjects
+ 
+  X.progress[[iter+1]] = X.mean
+  costs[[iter]] = sum.cost
+   
+  symbols( X.mean$x, X.mean$y, circles=X.mean$r/radius.scaling, inches=FALSE, bg="#FF000016", 
              fg="#00000000", bty="n", xlab="", ylab="", add=TRUE )
   #browser() 
 }

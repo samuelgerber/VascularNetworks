@@ -34,6 +34,7 @@ load.transport.distances.partitioned <- function( folder,
       print( sprintf("%s/transport%.3d-%.3d.Rdata", folder, i, j) )
       load( sprintf("%s/transport%.3d-%.3d.Rdata", folder, i, j) )
       n <- length(trp$cost) 
+
       map = trp$map[[n]]
       partition.from = partition.function( trp$from[[n]] )
       partition.to = partition.function( trp$to[[n]] )
@@ -52,7 +53,9 @@ load.transport.distances.partitioned <- function( folder,
           #dtmp2 = sum( map[index2, 3] * map[index2, 4] )^(1/p)
           #dtmp  = (dtmp1 + dtmp2)/2
           if(length(index) > 0 ){
-            dtmp = sum( (map[index, 3] * map[index, 4]) )^(1/p) /sum(map[index, 4])
+            dtmp = ( sum( (map[index, 3] * map[index, 4])) / sum(map[index,3]) )^(1/p) 
+            #distances[[k1]][i, j] =  dtmp
+            #distances[[k1]][j, i] =  dtmp
             distances[[k1]][[k2]][i, j] =  dtmp
             distances[[k1]][[k2]][j, i] =  dtmp
           }
@@ -67,3 +70,51 @@ load.transport.distances.partitioned <- function( folder,
   distances
 }
 
+
+
+load.transport.partitions <- function( folder, 
+                                       n.subjects, 
+                                       partition.function,  
+                                       n.partitions ){
+
+  distances = matrix(0, nrow=n.subjects, ncol=n.subjects)
+  costs = array(0, dim=c( n.partitions, n.partitions, n.subjects, n.subjects ) ) 
+  mass  = array(0, dim=c( n.partitions, n.partitions, n.subjects, n.subjects ) ) 
+  
+  for( i in 1:(n.subjects-1) ){
+    for( j in (i+1):n.subjects){
+      print( sprintf("%s/transport%.3d-%.3d.Rdata", folder, i, j) )
+      load( sprintf("%s/transport%.3d-%.3d.Rdata", folder, i, j) )
+      
+      n <- length(trp$cost) 
+
+            
+      distances[i, j] = trp$cost[ n ]
+      distances[j, i] = trp$cost[ n ]
+      
+      map = trp$map[[n]]
+      partition.from = partition.function( trp$from[[n]] )
+      partition.to = partition.function( trp$to[[n]] )
+      p.from <- max( partition.from )
+      p.to <- max( partition.to )
+      for( k1 in 1:n.partitions ){
+        for( k2 in 1:p.to ){
+          k.from = partition.from == k1 
+          k.to   = partition.to   == k2 
+          index  = which( k.from[ map[,1] ] & k.to[ map[,2] ] )
+          if(length(index) > 0 ){
+            mtmp = sum( map[index, 3] )
+            ctmp = sum( map[index, 4] * map[index,3] )
+            
+            mass[k1, k2, i, j] =  mtmp
+            costs[k1, k2, i, j] =  ctmp
+            
+            mass[k2, k1, j, i] =  mtmp
+            costs[k2, k1, j, i] =  ctmp
+          }
+        }
+      }
+    }
+  }
+  list(cost=costs, mass=mass, distances=distances)
+}

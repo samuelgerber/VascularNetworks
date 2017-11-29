@@ -34,7 +34,7 @@ points <- c()
 for( i in 1:n.partitions){
   for( j in 1:n.partitions){
     mds <- cmdscale( distances[[i]][[j]], eig=T,k=41, add=T )
-    #mds <- cmdscale( distances[[i]], eig=T,k=41, add=T )
+    #mds <- cmdscale( distances[[i]], eig=T,k=41)
     s = sprintf( "%d %d: %d", i, j, ncol(mds$points) ) 
     print(s)
     print(range(mds$eig))
