@@ -78,8 +78,8 @@ load.transport.partitions <- function( folder,
                                        n.partitions ){
 
   distances = matrix(0, nrow=n.subjects, ncol=n.subjects)
-  costs = array(0, dim=c( n.partitions, n.partitions, n.subjects, n.subjects ) ) 
-  mass  = array(0, dim=c( n.partitions, n.partitions, n.subjects, n.subjects ) ) 
+  costs = array(0, dim=c( n.subjects, n.subjects, n.partitions, n.partitions ) ) 
+  mass  = array(0, dim=c( n.subjects, n.subjects, n.partitions, n.partitions ) ) 
   
   for( i in 1:(n.subjects-1) ){
     for( j in (i+1):n.subjects){
@@ -106,11 +106,11 @@ load.transport.partitions <- function( folder,
             mtmp = sum( map[index, 3] )
             ctmp = sum( map[index, 4] * map[index,3] )
             
-            mass[k1, k2, i, j] =  mtmp
-            costs[k1, k2, i, j] =  ctmp
+            mass[i, j, k1, k2] =  mtmp
+            costs[i, j, k1, k2] =  ctmp
             
-            mass[k2, k1, j, i] =  mtmp
-            costs[k2, k1, j, i] =  ctmp
+            mass[j, i, k2, k1] =  mtmp
+            costs[j, i, k2, k1] =  ctmp
           }
         }
       }

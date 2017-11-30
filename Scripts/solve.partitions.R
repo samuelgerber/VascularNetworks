@@ -33,65 +33,78 @@ x <- cmdscale(partitions$distances, k=n.k)
 #setup linear programing problem to sole for partitions
 d.k <- array(0, c(n.subjects, n.subjects, ncol(x) ) )
 for(i in 1:ncol(x) ){
-  d.k[,,i] = as.matrix( dist(x[,i]) )
+  d.k[,,i] = as.matrix( dist(x[,i]) )^2
 }
 
 
 library(clpAPI)
 
 # preparing the model
-lp <- initProbCLP()
-     
+ 
 ncols  <- n.partitions^2 * n.k
-nrows  <- n.subjects^2 * n.k
+nrows  <- (n.subjects^2-n.subjects) * n.k + n.partitions^2
      
 # objective function
 obj <- rep(1, ncols)
+#obj <- c()
+#for(i in 1:n.k){
+#  obj = c(obj, rep( mean(d.k[,,i]), n.partitions^2)  )  
+#}
+
 
 # upper and lower bounds of the cols
 clower <- rep(0, ncols)
 cupper <- rep(1, ncols)
      
 # upper and lower bounds of the rows
-rlower <- c()
-for(i in 1:n.subjects){
-  for(j in 1:n.subjects){
-    if( i != j ){
-      for(k in 1:n.k){
-        rlower <- c(rlower, d.k[i,j,k]  )  
-      }
-    }
+rupper <- c()
+for(k in 1:n.k){
+  for( i in 1:n.subjects ){
+    rupper <- c(rupper, d.k[i,-i, k] * 10 )  
   }
 }
-rlower <- c(rlower, rep(1, n.k) )
-rupper <- clower     
+rlower = rep(0, length(rupper) )
+rupper <- c(rupper, rep(1, n.partitions^2) )
+rlower <- c(rlower, rep(1, n.partitions^2) )
 
 
 # constraint matrix
-ia <- as.vector(  outer( rep(0:(n.partitions^2-1), n.subjects*(n.subjects-1) ), 
-                         (0:(n.k-1)) * n.partitions^2, "+") )
-print( length(ia) )
-ia <- c(ia, as.vector(  outer( 0:(n.partitions^2-1), (0:(n.k-1)) * n.partitions^2, "+") ) )
-print( length(ia) )
+ia <- as.vector(
+        rbind(  
+          outer( 0:(n.subjects^2 - n.subjects-1), 
+                 rep( (0:(n.k-1)) * (n.subjects^2 - n.subjects), each=n.partitions^2) , "+"),
+          rep( nrows - (1:(n.partitions^2) ),  n.k )
+        )
+      )
+         
 
-ja <- n.partitions^2 * 0:(n.subjects * (n.subjects-1) * n.k + n.k)
+
+ja <- (n.subjects^2 - n.subjects + 1 ) * 0:(n.partitions^2  * n.k )
 
 ar <- c()
-for(i in 1:n.subjects){
-  for(j in 1:n.subjects){
-    if( i != j ){
-      ar <- c(ar, rep( as.vector( partitions$cost[,,i,j]), n.k ) )    
+for(k1 in 1:n.partitions){
+  for(k2 in 1:n.partitions){
+    for(i in 1:n.subjects){
+       ar <- c(ar, partitions$mass[i,-i,k1,k2]*partitions$cost[i,-i, k1, k2] )
     }
+    ar <- c(ar, 1)
   }
 }
-print(length(ar))
-ar <- c( ar, rep(1, n.partitions^2 * n.k) )
-print(length(ar))
+ar <- rep(ar, n.k)
+
+print( length(ia) )
+print( length(ar) )
+print( max(ia) )
+print( length(ja) )
+print( max(ja) )
 
 browser()
 
+
+lp <- initProbCLP()
+    
 # direction of optimization
-setObjDirCLP(lp, 1)
+setObjDirCLP(lp, -1)
      
 # load problem data
 loadProblemCLP( lp, ncols, nrows, ia, ja, ar,
@@ -101,10 +114,12 @@ loadProblemCLP( lp, ncols, nrows, ia, ja, ar,
 solveInitialCLP(lp)
      
 # retrieve the results
-statsus <- getSolStatusCLP(lp)
+status <- getSolStatusCLP(lp)
 objective <- getObjValCLP(lp)
-primal <- getColPrimCLP(lp)
-     
+colPrimal <- getColPrimCLP(lp)
+rowDual <- getRowDualCLP(lp)    
+rowPrimal <- getRowPrimCLP(lp)
+
 # remove problem object
 delProbCLP(lp)
      
