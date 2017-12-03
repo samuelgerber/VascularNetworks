@@ -46,7 +46,8 @@ step = 1
 
 X.progress = list()
 X.progress[[1]] = X.mean
-for(n in 1:40){
+costs <- list()
+for(iter in 1:40){
   gmra.mean = gmra.create.ikm(X=X.mean, eps=5, nKids=4, stop=3)
 
   X.update = as.data.table( matrix(0, nrow = nrow(X.mean), ncol = ncol(X.mean) ) )
@@ -87,10 +88,11 @@ for(n in 1:40){
   X.mean$r[X.mean$r<0] = 0
   #W.mean = mass.update / n.subjects
  
-  X.progress[[i+1]] = X.mean
+  X.progress[[iter+1]] = X.mean
+  costs[[iter]] = sum.cost
    
   symbols( X.mean$x, X.mean$y, circles=X.mean$r/radius.scaling, inches=FALSE, bg="#FF000016", 
              fg="#00000000", bty="n", xlab="", ylab="", add=TRUE )
-  browser() 
+  #browser() 
 }
 
