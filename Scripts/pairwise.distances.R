@@ -118,3 +118,50 @@ load.transport.partitions <- function( folder,
   }
   list(cost=costs, mass=mass, distances=distances)
 }
+
+
+
+
+load.transport.weighted.partitions <- function( folder, 
+                                       n.subjects, 
+                                       partition.function,  
+                                       n.partitions ){
+
+  distances = matrix(0, nrow=n.subjects, ncol=n.subjects)
+  costs = array(0, dim=c( n.subjects, n.subjects, n.partitions, n.partitions ) ) 
+  mass  = array(0, dim=c( n.subjects, n.subjects, n.partitions, n.partitions ) ) 
+  
+  for( i in 1:(n.subjects-1) ){
+    for( j in (i+1):n.subjects){
+      print( sprintf("%s/transport%.3d-%.3d.Rdata", folder, i, j) )
+      load( sprintf("%s/transport%.3d-%.3d.Rdata", folder, i, j) )
+      
+      n <- length(trp$cost) 
+
+            
+      distances[i, j] = trp$cost[ n ]
+      distances[j, i] = trp$cost[ n ]
+      
+      map = trp$map[[n]]
+      partition.from = partition.function( trp$from[[n]] )
+      partition.to = partition.function( trp$to[[n]] )
+      for( k1 in 1:length(partition.from) ){
+        for( k2 in 1:length(partition.to) ){
+           weight1 <- partition.from[[k1]]
+           weight2 <- partition.to[[k2]]
+           w <- weight1[map[, 1]] * weight2[map[, 2]]
+           #w <- w /sum(w)
+           mtmp = sum( w * map[, 3] )
+           ctmp = sum( map[, 4] * w * map[,3] )
+            
+           mass[i, j, k1, k2] =  mtmp
+           costs[i, j, k1, k2] =  ctmp
+            
+           mass[j, i, k2, k1] =  mtmp
+           costs[j, i, k2, k1] =  ctmp
+        }
+      }
+    }
+  }
+  list(cost=costs, mass=mass, distances=distances)
+}
