@@ -35,7 +35,8 @@ read.all.trees <- function(folder){
   for( d in dirs){
     name = strsplit(d, "/")[[1]]
     name = name[length(name)]
-    d = paste(d, "/VascularNetwork.tre", sep="")
+    #d = paste(d, "/VascularNetwork.tre", sep="")
+    d = paste(d, "/color-new-t1Phantom.tre", sep="")
     if( file.access(d) == 0 ){
       print(name)
       names[[index]] = name
