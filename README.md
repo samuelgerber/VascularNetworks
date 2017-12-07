@@ -24,6 +24,7 @@ Optimal transport interpolation between to vascular networks:
 ![Alt text](/Scripts/ip.gif "Simple optimal transport interpolation between to brain vasacular networks")
 
 Interpolation using only x,y for transportation cost:
+
 ![Alt text](/Scripts/ip2d.gif "Simple optimal transport interpolation between to brain vasacular networks")
 
 ### Multiresolution Optimal Transport
