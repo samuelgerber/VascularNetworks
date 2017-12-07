@@ -11,7 +11,7 @@ smooth.plain <- function(X, k=20){
 
 smooth.weighted <- function(X, volume, sigma = 5, k=4*sigma){
   library(RANN)
-  nn = nn2(X, k=k)
+  nn = nn2(X, k= min(k, nrow(X)) )
   w = exp( -nn$nn.dists / (2*sigma*sigma) )
   wSum = 0
   Xnew = 0
@@ -54,6 +54,7 @@ multiresolution.gmra <- function(X, n=8, show=FALSE, radius.scaling=1){
     X <-  as.data.table(X)
     mres$gmra[[i]] <-  gmra.create.ikm( X[, .(x, y, z, r)], nKids=4, eps=0.3, stop=3)
     Xnew <- gmra.centers( mres$gmra[[i]], 1000 )[, 1:3]
+    Xnew = matrix(Xnew, ncol=3)
     index <- gmra.partition(mres$gmra[[i]], 1000)
     
     sizes <- sapply(index, length)

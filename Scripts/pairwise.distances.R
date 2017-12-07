@@ -150,6 +150,7 @@ load.transport.weighted.partitions <- function( folder,
            weight1 <- partition.from[[k1]]
            weight2 <- partition.to[[k2]]
            w <- weight1[map[, 1]] * weight2[map[, 2]]
+           
            #w <- w /sum(w)
            mtmp = sum( w * map[, 3] )
            ctmp = sum( map[, 4] * w * map[,3] )

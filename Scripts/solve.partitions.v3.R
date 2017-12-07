@@ -21,32 +21,6 @@ grid.partition <- function(X){
 
 }
 
-
-weight.grid.partition <- function(X){
- 
-  s2 = 400
-  partition <- list()
-  for( i in 1:3){
-   r[[i]] <- c(range(X[,1]), 0)
-   d <- r[[i]][2] - r[[i]][1]
-   r[[i]][1] =r[[i]][1] + d/4
-   r[[i]][2] =r[[i]][1] + d/2
-   r[[i]][3] =r[[i]][1] + 3*d/4
-  }
-  index = 1
-  for( i in 1:3 ){
-    for( j in 1:3 ){
-      for( k in 1:3 ){
-        sweep(X[, 1:3], 1, c(r[[1]][i], r[[2]][j], r[[3]][k]) )
-        partition[[index]] <- exp(-rowSums(X^2) / (2*s2))
-        partition[[index]] <- partition[[index]] / sum(partition[[index]] )
-        index <- index + 1
-      }
-    }
-  }
-  partition
-}
-
 n.subjects = 42
 n.partitions = 27
 partitions = load.transport.partitions( 
@@ -98,7 +72,7 @@ library(nloptr)
 opts <- list("algorithm"="NLOPT_LD_MMA", 
              "xtol_rel"=1.0e-7, 
              "print_level"=1, 
-             "maxeval" = 10000,
+             "maxeval" = 10000
              )
 res <- nloptr( x0 = rep(0, n.p2), 
                eval_f = f.eval,
@@ -126,11 +100,7 @@ vals <- sort(sol[sol!=0], decreasing=TRUE)
 vals <- vals[seq(1,length(vals), by=2)]
 
 
-p.ind <- c()
-for(i in 1){
-  p.ind <- rbind(p.ind, sort( which( sol == vals[i], arr.ind=TRUE ) ) )
-}
-p.ind <- unique(p.ind)
+p.ind = which( sol == vals[1], arr.ind=TRUE ) 
 
 X = all$data[[17]]
 X.p <- grid.partition(X[,1:4])
