@@ -44,7 +44,7 @@ for(i in 1:ncol(x) ){
 }
 res$solution = rep(0, n.p2)
   
-n.repeats <- 10
+n.repeats <- 100
 glmCV <- rep(NA, n.repeats)
 sols <- list()
 glms <- c()
@@ -56,17 +56,17 @@ for(k in 1:n.repeats){
 
 
 
-  #data1 = data.frame( x[index.train,1:15], gender = as.factor(labels[index.train,2]) )
-  #levels( data1$gender ) <- c("F", "M", NA)
-  #glm.model <- glm(gender ~ ., data=data1, family=binomial() )
-  #glms <- rbind(glms, glm.model$coefficients)
-  #glm.dir   <- glm.model$coefficients[-1]
-  #glm.dir   <- glm.dir / sum(glm.dir^2)
-  #print(glm.model)
-  #x.proj <- x[ ,1:15] %*% glm.dir
-  #B <- as.vector( as.matrix(dist(x.proj))^2 )
+  data1 = data.frame( x[index.train,1:15], gender = as.factor(labels[index.train,2]) )
+  levels( data1$gender ) <- c("F", "M", NA)
+  glm.model <- glm(gender ~ ., data=data1, family=binomial() )
+  glms <- rbind(glms, glm.model$coefficients)
+  glm.dir   <- glm.model$coefficients[-1]
+  glm.dir   <- glm.dir / sum(glm.dir^2)
+  print(glm.model)
+  x.proj <- x[ ,1:15] %*% glm.dir
+  B <- as.vector( as.matrix(dist(x.proj))^2 )
 
-  B <- as.vector( as.matrix( dist(as.integer( labels[index.train,2] ) ))^2 )
+  #B <- as.vector( as.matrix( dist(as.integer( labels[index.train,2] ) ))^2 )
 
 
   #least squares
@@ -83,11 +83,11 @@ for(k in 1:n.repeats){
 
   library(nloptr)
 
-  opts <- list("algorithm"="NLOPT_LD_LBFGS", 
-             "xtol_rel"=1.0e-4,
+  opts <- list("algorithm"="NLOPT_LD_MMA", 
+             "xtol_rel"=1.0e-5,
              "xtol_abs"=rep(1e-6, n.p2),
              "print_level"=1, 
-             "maxeval" = 1000
+             "maxeval" = 200
              )
   res <- nloptr( x0 = res$solution, 
                  eval_f = f.eval,
@@ -95,6 +95,20 @@ for(k in 1:n.repeats){
                  ub = rep(1, n.p2),
                  opts = opts
                 )
+
+#  opts <- list("algorithm"="NLOPT_LD_LBFGS", 
+#             "xtol_rel"=1.0e-4,
+#             "xtol_abs"=rep(1e-4, n.p2),
+#             "print_level"=1, 
+#             "maxeval" = 50
+#             )
+#  res <- nloptr( x0 = res$solution, 
+#                 eval_f = f.eval,
+#                 lb = rep(0, n.p2),
+#                 ub = rep(1, n.p2),
+#                 opts = opts
+#                )
+
 
   sol <- matrix(res$solution, n.partitions)
   sols[[k]] <- sol
