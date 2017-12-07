@@ -67,8 +67,8 @@ for(i in 1:nrow(p.index) ){
 
 
 #library(rgl)
-plot3d(X1[ ,1:3], alpha=0.5, type="s", radius=X1[,4], col="#551A33",
-        box=TRUE, axes=TRUE,  xlab="", ylab="", zlab="", )
+#plot3d(X1[ ,1:3], alpha=0.5, type="s", radius=X1[,4], col="#551A33",
+#        box=TRUE, axes=TRUE,  xlab="", ylab="", zlab="", )
 #
 #plot3d(X[ind2,1:3], alpha=0.5, type="s", radius=X[ind2,4], col="#E17D17", add=T )
 #

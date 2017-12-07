@@ -4,7 +4,8 @@ library(mop)
 
 plot.interpolation.2d <- function(trp1, radius.scaling ){
   index = 0
-  for( t in c( seq(0, 1, by=0.05), seq(1, 0, by=-0.05) ) ){ 
+  par(mar=c(1,1,1,1) )
+  for( t in seq(0, 1, by=0.02) ){ 
     X = multiscale.transport.interpolate(trp1, length(trp1$map), t=t)
     #plot(NA, xlim=range(X$X[,1]), ylim=range(X$X[,2]), 
     #     bty="n", xlab="", ylab="", axes=FALSE)

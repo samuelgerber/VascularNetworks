@@ -44,3 +44,4 @@ partition.plot( sig.dist[1:3, ], all$data[[1]], grid.partition)
 
 ls.cv <- partition.least.squares.cv(partitions, labels)
 
+

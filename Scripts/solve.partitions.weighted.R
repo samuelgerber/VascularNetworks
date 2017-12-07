@@ -62,3 +62,23 @@ sig.dist <- distance.fraction(ls$sol, ls$dists.proj,
 partition.plot.weighted( sig.dist[1:3, ], all$data[[1]], grid.partition.weight )
 
 ls.cv <- partition.least.squares.cv(partitions, labels)
+
+
+#compare to just using mass in each partition
+V <- matrix(NA, nrow=n.subjects, ncol=n.partitions)
+R <- matrix(NA, nrow=n.subjects, ncol=n.partitions)
+
+for(i in 1:n.subjects){
+  X <- all$data[[i]]
+  X.p <- grid.partition.weight( X[,1:4] )
+  for(j in 1:length(X.p) ){
+    V[i,j] =  sum( X.p[[j]] * X$v ) / sum(X.p[[j]] ) 
+    R[i,j] =  sum( X.p[[j]] * X$r ) / sum(X.p[[j]] ) 
+  }
+}
+
+data1 = data.frame( V, gender = as.factor(labels[,2]) )
+levels( data1$gender ) <- c("F", "M", NA)
+trctrl <- trainControl(method = "repeatedcv", number = 2, repeats = 20)
+glmCV <- train(gender ~., data = data1, method = "glm", trControl=trctrl)
+glmCV
