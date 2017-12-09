@@ -171,3 +171,21 @@ distance.fraction <- function(sol, dists.proj, A){
 }
 
 
+distance.fraction.cor <- function(sol, dists.dir, A){
+  library(data.table)
+  sig.dist <- c()
+  i.rm <- which(sol !=0, arr.ind=TRUE)
+  for( i in 1:nrow(i.rm) ){
+    if(i.rm[i,1] < i.rm[i, 2]){
+    
+      tmp <- matrix(0, nrow(sol), ncol(sol) )  
+      tmp[i.rm[i,1], i.rm[i, 2] ] = sol[i.rm[i,1], i.rm[i, 2] ]
+      tmp[i.rm[i,2], i.rm[i, 1] ] = sol[i.rm[i,2], i.rm[i, 1] ]
+      dists.tmp <- A %*% as.vector(tmp)
+      sig.dist = rbind(sig.dist, c(cor(dists.tmp, dists.dir), i.rm[i,]) )
+    }
+  }
+  sig.dist <- as.data.table(sig.dist)
+  colnames(sig.dist) <- c("cor", "index1", "index2")
+  sig.dist[order(cor, decreasing=T), ]
+}

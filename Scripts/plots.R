@@ -12,7 +12,7 @@ plot.interpolation.2d <- function(trp1, radius.scaling ){
     symbols( X$X, circles=X$X[,4]*radius.scaling, inches=FALSE, bg="#00000010", 
              fg="#00000000", bty="n", xlab="", ylab="", xaxt="n", yaxt="n")
     dev.copy(png, sprintf( "ip-%.5d.png", index) )
-   dev.off()
+    dev.off()
     index = index +1
   }
 

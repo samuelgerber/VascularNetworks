@@ -42,7 +42,8 @@ grid.partition.weight <- function(X){
 n.subjects = 42
 n.partitions = 64
 partitions = load.transport.weighted.partitions( 
-  "../../Processed/Transport06/transport-maps/", n.subjects, grid.partition.weight, n.partitions)
+  "../../Processed/Transport06/transport-maps/", n.subjects, 
+  grid.partition.weight, n.partitions )
 
 
 ls <- partition.least.squares(partitions, labels)
@@ -50,19 +51,28 @@ ls <- partition.least.squares(partitions, labels)
 mds2 <- cmdscale( matrix(ls$dists.proj, n.subjects), eig=TRUE, k=41)
 data1 = data.frame( mds2$points[,1], gender = as.factor(labels[,2]) )
 levels( data1$gender ) <- c("F", "M", NA)
-trctrl <- trainControl(method = "repeatedcv", number = 2, repeats = 20)
+trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20)
 glmCV <- train(gender ~., data = data1, method = "glm", trControl=trctrl)
 glmCV
 
 
+A <- matrix( as.vector(partitions$cost), nrow=n.subjects^2, ncol=n.partitions^2) 
+sig.dist <- distance.fraction( ls$sol, ls$dists.proj, A )
+partition.plot.weighted( sig.dist.c[1:3, ], all$data[[1]], grid.partition.weight )
+ls.cv <- partition.least.squares.cv( partitions, labels )
 
-sig.dist <- distance.fraction(ls$sol, ls$dists.proj, 
-                              matrix( as.vector(partitions$cost), nrow=n.subjects^2, ncol=n.partitions^2) )
 
-partition.plot.weighted( sig.dist[1:3, ], all$data[[1]], grid.partition.weight )
 
-ls.cv <- partition.least.squares.cv(partitions, labels)
 
+
+
+
+
+
+
+
+
+##Experimental
 
 #compare to just using mass in each partition
 V <- matrix(NA, nrow=n.subjects, ncol=n.partitions)
@@ -77,8 +87,33 @@ for(i in 1:n.subjects){
   }
 }
 
-data1 = data.frame( V, gender = as.factor(labels[,2]) )
+data1 = data.frame( prcomp(V)$x, gender = as.factor(labels[,2]) )
 levels( data1$gender ) <- c("F", "M", NA)
-trctrl <- trainControl(method = "repeatedcv", number = 2, repeats = 20)
-glmCV <- train(gender ~., data = data1, method = "glm", trControl=trctrl)
+res <- c()
+for(i in 1:42){
+trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20)
+glmCV <- train(gender ~., data = data1[, c(1:i,43)], method = "glm", trControl=trctrl)
+res <- rbind(res, glmCV$results)
+}
+
+trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20)
+glmCV <- train(gender ~., data = data1[, c(26,30,64,65)], method = "glm", trControl=trctrl)
 glmCV
+
+
+
+  x <- cmdscale(partitions$distances, k=15)
+data1 = data.frame( x, gender = as.factor(labels[,2]) )
+levels( data1$gender ) <- c("F", "M", NA)
+levels( data1$gender ) <- c("F", "M", NA)
+trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20, classProbs = TRUE, summaryFunction = twoClassSummary)
+glmCV <- train(gender ~., data = data1, method = "glm", trControl=trctrl, metric="ROC")
+glmCV
+glm.model <- glm(gender ~ ., data=data1, family=binomial() )
+glm.dir   <- glm.model$coefficients[-1]
+glm.dir   <- glm.dir / sum(glm.dir^2)
+x.proj <- x %*% glm.dir
+
+sig.dist.c <- distance.fraction.cor(ls$sol, as.vector(as.matrix(dist(x.proj))), A)
+
+

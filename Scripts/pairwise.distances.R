@@ -75,7 +75,8 @@ load.transport.distances.partitioned <- function( folder,
 load.transport.partitions <- function( folder, 
                                        n.subjects, 
                                        partition.function,  
-                                       n.partitions ){
+                                       n.partitions 
+                                      ){
 
   distances = matrix(0, nrow=n.subjects, ncol=n.subjects)
   costs = array(0, dim=c( n.subjects, n.subjects, n.partitions, n.partitions ) ) 
