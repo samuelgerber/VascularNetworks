@@ -72,9 +72,9 @@ ls.cv <- partition.least.squares.cv( partitions, labels )
 
 
 
-##Experimental
-
 #compare to just using mass in each partition
+trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20, classProbs = TRUE, summaryFunction = twoClassSummary)
+
 V <- matrix(NA, nrow=n.subjects, ncol=n.partitions)
 R <- matrix(NA, nrow=n.subjects, ncol=n.partitions)
 
@@ -87,33 +87,53 @@ for(i in 1:n.subjects){
   }
 }
 
-data1 = data.frame( prcomp(V)$x, gender = as.factor(labels[,2]) )
+data1 = data.frame( prcomp(cbind(V, R))$x, gender = as.factor(labels[,2]) )
 levels( data1$gender ) <- c("F", "M", NA)
-res <- c()
-for(i in 1:42){
-trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20)
-glmCV <- train(gender ~., data = data1[, c(1:i,43)], method = "glm", trControl=trctrl)
-res <- rbind(res, glmCV$results)
+res1 <- c()
+for(i in 1:20){
+  glmCV <- train(gender ~., data = data1[, c(1:i,43)], method = "glm", trControl=trctrl)
+  res1 <- rbind(res1, glmCV$results)
 }
 
-trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20)
-glmCV <- train(gender ~., data = data1[, c(26,30,64,65)], method = "glm", trControl=trctrl)
-glmCV
+  
+x <- cmdscale(partitions$distances, k=20)
+res <- c()
+for( i in 1:ncol(x)){
+  data1 = data.frame( x[,1:i], gender = as.factor(labels[,2]) )
+  levels( data1$gender ) <- c("F", "M", NA)
+  levels( data1$gender ) <- c("F", "M", NA)
+  glmCV <- train(gender ~., data = data1, method = "glm", trControl=trctrl, metric="ROC")
+  res <- rbind(res, glmCV$results)
+}
+
+ylim <-c( min(res1$ROC-res1$ROCSD), max(res$ROC + res$ROCSD) )
+
+
+par(mar=c(5,5,2,2))
+plot( res$ROC, cex=2, ylim=ylim, xlab="Dimensions", ylab="AUC", 
+      cex.lab=2, cex.axis=1.5, bty="n", axes=FALSE)
+axis(1, c(1,5,10,15,20), cex.axis=1.5)
+axis(2, cex.axis=1.5)
+abline(h=24/41, col="gray", lwd=3)
+arrows(1:20, res$ROC-res$ROCSD, 1:20, res$ROC+res$ROCSD, length=0.05, angle=90, code=3, lwd=2)
+points(res$ROC, col="#0097c3", pch=19, cex=2)
+points(res$ROC, cex=2)
+arrows(1:20+0.3, res1$ROC-res1$ROCSD, 1:20+0.3, res1$ROC+res1$ROCSD, length=0.05, angle=90, code=3, lwd=2)
+points(1:20+0.3, res1$ROC, col="#E17D17", pch=19, cex=2)
+points(1:20+0.3, res1$ROC, cex=2)
+
+
+#glm.model <- glm(gender ~ ., data=data1, family=binomial() )
+#glm.dir   <- glm.model$coefficients[-1]
+#glm.dir   <- glm.dir / sum(glm.dir^2)
+#x.proj <- x %*% glm.dir
+
+#sig.dist.c <- distance.fraction.cor(ls$sol, as.vector(as.matrix(dist(x.proj))), A)
 
 
 
-  x <- cmdscale(partitions$distances, k=15)
-data1 = data.frame( x, gender = as.factor(labels[,2]) )
-levels( data1$gender ) <- c("F", "M", NA)
-levels( data1$gender ) <- c("F", "M", NA)
-trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20, classProbs = TRUE, summaryFunction = twoClassSummary)
-glmCV <- train(gender ~., data = data1, method = "glm", trControl=trctrl, metric="ROC")
-glmCV
-glm.model <- glm(gender ~ ., data=data1, family=binomial() )
-glm.dir   <- glm.model$coefficients[-1]
-glm.dir   <- glm.dir / sum(glm.dir^2)
-x.proj <- x %*% glm.dir
-
-sig.dist.c <- distance.fraction.cor(ls$sol, as.vector(as.matrix(dist(x.proj))), A)
-
+#data1 = data.frame( x[,c(1:15)], gender = as.factor(labels[,2]) )
+#levels( data1$gender ) <- c("F", "M", NA)
+#levels( data1$gender ) <- c("F", "M", NA)
+#glmCV <- train(gender ~., data = data1, method = "glm", trControl=trctrl, metric="ROC")
 
