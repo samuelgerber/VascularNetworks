@@ -41,9 +41,9 @@ grid.partition.weight <- function(X){
 
 n.subjects = 42
 n.partitions = 64
-partitions = load.transport.weighted.partitions( 
-  "../../Processed/Transport06/transport-maps/", n.subjects, 
-  grid.partition.weight, n.partitions )
+#partitions = load.transport.weighted.partitions( 
+#  "../../Processed/Transport06/transport-maps/", n.subjects, 
+#  grid.partition.weight, n.partitions )
 
 
 ls <- partition.least.squares(partitions, labels)
@@ -71,9 +71,9 @@ ls.cv <- partition.least.squares.cv( partitions, labels )
 
 
 
-
 #compare to just using mass in each partition
-trctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 20, classProbs = TRUE, summaryFunction = twoClassSummary)
+trctrl <- trainControl( method = "repeatedcv", number = 3, repeats = 20, 
+                        classProbs = TRUE, summaryFunction = twoClassSummary )
 
 V <- matrix(NA, nrow=n.subjects, ncol=n.partitions)
 R <- matrix(NA, nrow=n.subjects, ncol=n.partitions)
@@ -87,7 +87,7 @@ for(i in 1:n.subjects){
   }
 }
 
-data1 = data.frame( prcomp(cbind(V, R))$x, gender = as.factor(labels[,2]) )
+data1 = data.frame( prcomp( R)$x, gender = as.factor(labels[,2]) )
 levels( data1$gender ) <- c("F", "M", NA)
 res1 <- c()
 for(i in 1:20){

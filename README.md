@@ -27,6 +27,14 @@ Interpolation using only x,y for transportation cost:
 
 ![Alt text](/Scripts/ip2d.gif "Simple optimal transport interpolation between to brain vasacular networks")
 
+
+Result of projection of the pairwise optimal transport maps onto the direction best seperating male versus female (blue male surplus mass, orange female surplus mass)
+
+![Alt text](/Scripts/movie-loop.gif "Female versus male optimal transport projection")
+
+
+
+
 ### Multiresolution Optimal Transport
 Decompoition of vascular network into a multiresolution representation:
 
