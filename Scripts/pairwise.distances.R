@@ -109,7 +109,13 @@ load.transport.partitions <- function( folder,
           if(length(index) > 0 ){
             mtmp = sum( map[index, 3] )
             ctmp = sum( map[index, 4] * map[index,3] )
-            dtmp = t(delta[index,])  %*% map[index,3]
+            if(length(index) > 1 ){
+              dtmp = t(delta[index,])  %*% map[index,3]
+            }
+            else{
+              dtmp = delta[index,]  * map[index,3]
+            }
+
             mass[ i, j, k1, k2] =  mtmp
             costs[i, j, k1, k2] =  ctmp
             deltas[i, j, k1, k2, ] = dtmp
