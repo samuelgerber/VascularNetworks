@@ -2,23 +2,23 @@
 partition.plot <- function(p.index, X1, partition.function){
 
 par( mar = c(1,1,1,1) )
-par( mfrow = c(nrow(p.index),3) )
-
-
-for(i in 1:nrow(p.index) ){
-  p.ind <- p.index[i, 2:3]
-
+par( mfrow = c(nrow(p.index),4) )
 
   xr = range(X1$x)
   yr = range(X1$y)
   zr = range(X1$z)
+  rr = range(X1$r)
 
   X = expand.grid(seq(xr[1], xr[2], length.out=23),
-                seq(yr[1], yr[2], length.out=23),
-                seq(zr[1], zr[2], length.out=23)
-                )
-  X[,4] = 4
+                  seq(yr[1], yr[2], length.out=23),
+                  seq(zr[1], zr[2], length.out=23),
+                  seq(rr[1], rr[2], length.out=23)
+                  )
   X.p <- partition.function(X[,1:4])
+
+for(i in 1:nrow(p.index) ){
+  p.ind <- p.index[i, 2:3]
+
   elem1 = is.element(X.p, t(p.ind[ ,1]))
   elem2 = is.element(X.p, t(p.ind[ ,2]))
   ind0 <- which( !(elem1 | elem2) )
@@ -58,6 +58,19 @@ for(i in 1:nrow(p.index) ){
   }
   if(length(ind2) > 0 ){
     symbols( X[ind2, 2:3], circles=X[ind2,4]*1.5, inches=FALSE, bg="#E17D1740", 
+        fg="#00000000", add=TRUE)
+  }
+
+
+  symbols( X1[, c(1,4)], circles=X1[,4]*1.5,, inches=FALSE, bg="#00000010", 
+        fg="#00000000", bty="n", xaxt="n", yaxt="n", xlim=yr, ylim=rr)
+
+  if(length(ind1) > 0 ){
+    symbols( X[ind1,c(1,4)], circles=X[ind1,4]*2.5, inches=FALSE, bg="#0097c340", 
+        fg="#00000000",  add=TRUE)
+  }
+  if(length(ind2) > 0 ){
+    symbols( X[ind2, c(1,4)], circles=X[ind2,4]*2.5, inches=FALSE, bg="#E17D1740", 
         fg="#00000000", add=TRUE)
   }
 
@@ -196,6 +209,108 @@ partition.plot.weighted.fm <- function(sig.index, X1, partition.function, lwd.fa
 
 }
 
+
+
+
+
+##
+partition.plot.weighted.slice.fm <- function(sig.index, X1, partition.function){
+  FF<- 0
+  FM <- 0
+  MF <- 0
+  MM <- 0
+  up   <- upper.tri(partitions$mass[1,2,,])
+  for(i in 1:n.subjects){
+    for(j in 1:n.subjects){
+      if(labels[i,2] == "F"){
+        if( labels[j,2] == "F"){
+          FF <- FF + partitions$mass[i,j,,]
+        }
+        else{
+          FM <- FM + partitions$mass[i,j,,]
+        } 
+      }
+      else{
+        if( labels[j,2] == "F"){
+          MF <- MF + partitions$mass[i,j,,]
+        }
+        else{
+          MM <- MM + partitions$mass[i,j,,]
+        } 
+      }
+    }
+  }
+
+
+
+  
+
+  xr = range(X1$x)
+  yr = range(X1$y)
+  zr = range(X1$z)
+  ranges <- rbind(xr,yr,zr)
+  X = expand.grid(seq(xr[1], xr[2], length.out=23),
+                  seq(yr[1], yr[2], length.out=23),
+                  mean(zr)
+                  )
+  Y = expand.grid(mean(xr),
+                  seq(yr[1], yr[2], length.out=23),
+                  seq(zr[1], zr[2], length.out=23)
+                  )
+  Z = expand.grid(seq(xr[1], xr[2], length.out=23),
+                  mean(yr),
+                  seq(zr[1], zr[2], length.out=23)
+                  )
+
+  X[,4] = 4
+  Y[,4] = 4
+  Z[,4] = 4
+  
+  
+  X.p <- partition.function(X[,1:4])
+  Y.p <- partition.function(Y[,1:4])
+  Z.p <- partition.function(Z[,1:4])
+  
+  slices.p <- list(X.p, Y.p, Z.p)
+  slices <- list(X, Y, Z)
+
+  library(rgl)
+  plot3d(X1[ ,1:3], alpha=1, type="s", radius=X1[,4], col="#771A13",
+        box=TRUE, axes=TRUE,  xlab="", ylab="", zlab="" )
+  planes3d(0,0,1, -mean(zr) ) 
+  planes3d(0,1,0, -mean(yr) ) 
+  planes3d(1,0,0, -mean(xr) ) 
+  for(s in 1:3){
+    from <- 0
+    to <- 0
+    for(i in 1:nrow(sig.index) ){
+
+      i.s <- as.integer(sig.index[i,2])
+      i.e <- as.integer(sig.index[i,3])
+      if( MF[i.s, i.e] > FM[i.s, i.e] ){
+        i.t = i.s
+        i.s = i.e
+        i.e = i.t
+      }
+      from <- from + slices.p[[s]][[i.s]]
+      to <- to + slices.p[[s]][[i.t]]
+    }
+    from = from 
+    to   = to 
+
+    f.i = which(from > 0.001)
+    t.i = which(to > 0.001)
+
+    col1 <- rgb( 0.00, 0.59, 0.76 )
+    col2 <- rgb( 0.88, 0.49, 0.09 )
+    spheres3d(slices[[s]][f.i,], alpha=0.5*from[f.i], col=col1, radius=2)
+    #spheres3d(slices[[s]][t.i,], alpha=0.5*to[t.i], col=col2, radius=2)
+  }
+
+}
+
+
+
 partition.plot.weighted.slice.fm <- function(sig.index, X1, partition.function){
   FF<- 0
   FM <- 0
@@ -306,22 +421,6 @@ partition.plot.3d.weighted.slice.fm <- function( sig.index,
   yr = range(X1$y)
   zr = range(X1$z)
   ranges <- rbind(xr,yr,zr)
-  #X = expand.grid(seq(xr[1], xr[2], length.out=23),
-  #                seq(yr[1], yr[2], length.out=23),
-  #                seq(zr[1], zr[2], length.out=23)
-  #                )
-
-  #X[,4] = 4
-  
-  #X.p <- partition.function(X[,1:4])
-
-  #library(rgl)
-  #plot3d(X1[ ,1:3], alpha=1, type="s", radius=X1[,4], col="#881111",
-  #      box=FALSE, axes=FALSE,  xlab="", ylab="", zlab="" )
-  #planes3d(0,0,1, -mean(zr), col="gray", texture="BW-axial.png" ) 
-  #planes3d(0,1,0, -mean(yr), col="gray" ) 
-  #planes3d(1,0,0, -mean(xr), col="gray" ) 
-
   plot3d.slices(X1)
 
 
@@ -411,7 +510,119 @@ partition.plot.3d.weighted.slice.fm <- function( sig.index,
 
 
 
-plot3d.slices <- function(X1){
+
+
+
+partition.plot.3d.slice.fm <- function( sig.index, 
+                                              X1, 
+                                              partition.function, 
+                                              labels, 
+                                              partitions,
+                                              sol,
+                                              X){
+  
+  xr = range(X1$x)
+  yr = range(X1$y)
+  zr = range(X1$z)
+  ranges <- rbind(xr,yr,zr)
+  plot3d.slices(X1)
+
+
+  dir.total = 0
+  dir.mm = 0
+  dir.ff = 0
+  col1 <- rgb( 0.01, 0.59, 0.76 )
+  col2 <- rgb( 0.88, 0.49, 0.09 )
+  n.mm = 0
+  n.ff = 0
+  n.fm = 0
+  mass.fm <- rep(0, dim(partitions$mass)[3])
+  for(i in 1:nrow(sig.index) ){
+    from <- as.integer(sig.index[i,2])
+    to <- as.integer(sig.index[i,3])
+    coeff<- sol[from, to]
+    sig <- as.double(sig.index[i, 1])
+    #x.from <- as.vector(t(X) %*% X.p[[ from ]] / sum(X.p[[ from ]]))
+    #x.to <- as.vector(t(X) %*% X.p[[ to ]] / sum(X.p[[ to ]]))
+    dir <- 0
+    n = 0
+    for(k1 in 1:dim(partitions$deltas)[1]){
+      for(k2 in 1:dim(partitions$deltas)[2]){
+        tmp1 <- c( partitions$deltas[ k1,k2, from,   to, ], 1) * coeff * 
+                partitions$mass[ k1,k2, from,   to ]
+        tmp2 <- c(partitions$deltas[ k2,k1,   to, from, ], -1) * coeff *
+                partitions$mass[ k1,k2, from,   to ]
+        if(labels[k1,2] != labels[k2,2] ){
+           n.fm = n.fm + 1
+           n = n =1
+           if(labels[k1, 2] == "M"){
+             dir = dir + tmp1 - tmp2
+           }
+           else{
+             dir = dir - tmp1 + tmp2
+           }
+        }
+        else if(labels[k1, 2] == "M"){
+          n.mm = n.mm + 1
+          dir.mm = dir.mm + (tmp1-tmp2) 
+        }
+        else{
+          n.ff = n.ff + 1
+          dir.ff = dir.ff + (tmp1-tmp2) 
+        }
+      }
+    }
+    mass.fm[from] = mass.fm[from] + sign(dir[5]) * sqrt(abs(dir[5])) * sig
+    mass.fm[to] = mass.fm[to] - sign(dir[5]) * sqrt(abs(dir[5])) * sig
+
+    dir.total = dir.total + dir 
+    #a = min(0.75, max(0.3, 20*as.double(sig.index[i,1]) ) ) #dir[5] * 1000) )
+    #xf <- x.from[1:3] + runif(3) * 10 - 5
+    #xt <- x.to[1:3] + runif(3) * 10 - 5
+    #segments3d( rbind(xf, xt), col=col1, lwd=3, alpha=a) 
+    #spheres3d(xf , alpha=a, col=col1, radius=4)
+    #spheres3d(xt , alpha=a, col=col2, radius=4)
+  }
+
+  x.m <- matrix(0, nrow=length(mass.fm), ncol=3)
+  n.x <- rep(0, length(mass.fm) )
+  for( n in 1:length(X) ){
+    print(n)
+    X.p <- partition.function(X[[n]][,1:4])
+    for(i in 1:max(X.p) ){
+      ind <- which(X.p[[i]] == i )
+      if(length(ind) > 0 ){
+        x <- colMeans( X[[n]][ind, 1:3] ) 
+        x.m[i, ] <- x.m[i, ] + x
+        n.x[i] = n.x[i] + 1
+      }
+    }
+  }
+  for(i in 1:nrow(x.m) ){
+    x.m[i, ] = x.m[i, ] / n.x[i]
+  }
+  print(summary(x.m) )
+  #a = min(0.75, max(0.3, 20*as.double(sig.index[i,1]) ) ) #dir[5] * 1000) )
+  scale = max(abs(mass.fm) )
+  print(scale)
+  for( i in 1:length(mass.fm) ){
+
+    if( mass.fm[i] < 0){
+      spheres3d(x.m[i, ], col=col1, radius= -20 * mass.fm[i] / scale, alpha=0.7)
+    }
+    else{
+      spheres3d(x.m[i, ], col=col2, radius = 20*mass.fm[i]/scale, alpha=0.7)
+    }
+  }
+  list(dir.total/n.fm, dir.ff/n.ff, dir.mm/n.mm, mass.fm)
+}
+
+
+
+
+plot3d.slices <- function(X1, col="#881111", alpha=1){
+
+  library(rgl) 
 
   xr = range(X1$x)
   xr[1] = xr[1]-10
@@ -424,8 +635,8 @@ plot3d.slices <- function(X1){
   zr[2] = zr[2]+20
 
   library(rgl)
-  plot3d(X1[ ,1:3], alpha=1, type="s", radius=X1[,4], col="#881111",
-        box=FALSE, axes=FALSE,  xlab="", ylab="", zlab="" )
+  plot3d( X1[ X1$r < 1.5,1:3], type="s", radius=X1[ X1$r < 1.5, 4], col=col, alpha=alpha,
+           box=FALSE, axes=FALSE,  xlab="", ylab="", zlab="" )
 
  zmat <- matrix(mean(zr),2,2)
  ymat <- matrix(mean(yr),2,2)
@@ -456,5 +667,4 @@ plot3d.slices <- function(X1){
                 lit=F,fog=T,color="white",textype="rgb",texture="BW-y.png",add=T)
 
 }
-
 

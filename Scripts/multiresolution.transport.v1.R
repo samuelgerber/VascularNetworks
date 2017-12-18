@@ -1,5 +1,5 @@
 # Multiresolution transport versoin 1
-# Transport finest scale and decomposition that transport plan according to teh
+# Transport finest scale and decomposition that transport plan according to the
 # coarser scales
 
 multiresolution.transport.v1 <- function( mres1, mres2, trp.lp = NULL ){

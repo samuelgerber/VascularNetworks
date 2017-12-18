@@ -37,7 +37,7 @@ trctrl <- trainControl(method = "repeatedcv", number = 2, repeats = 20)
 glmCV <- train(gender ~., data = data1, method = "glm", trControl=trctrl)
 glmCV
 
-sig.dist <- distance.fraction(ls$sol, ls$dists.proj, 
+sig.dist <- distance.fraction(ls2$sol, ls2$dists.proj, 
                               matrix( as.vector(partitions$cost), nrow=n.subjects^2, ncol=n.partitions^2) )
 
 partition.plot( sig.dist[1:3, ], all$data[[1]], grid.partition)

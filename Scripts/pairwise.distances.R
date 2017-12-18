@@ -13,8 +13,6 @@ load.transport.distances <- function( folder, n){
   distances
 }
 
-
-
 load.transport.distances.partitioned <- function( folder, 
                                                   n.subjects, 
                                                   partition.function,  

@@ -68,7 +68,7 @@ partition.least.squares.cv <- function(partitions, labels, n.k=15, n.repeats = 2
     sols[[k]] <- sol
     dists.proj <- A %*% res$solution
 
-    mds2 <- cmdscale( matrix(dists.proj, n.subjects), eig=TRUE, k=41)
+    mds2 <- cmdscale( matrix( sqrt(dists.proj), n.subjects), eig=TRUE, k=41)
     data.train = data.frame( x = mds2$points[index.train,1], 
                              gender = as.factor(labels[index.train,2]) )
     data.test  = data.frame( x = mds2$points[index.test,1] , 
@@ -101,7 +101,7 @@ partition.least.squares<- function(partitions, labels, n.k=15){
   n.p2 = n.partitions^2
 
   #leasts quares with eqaulity constraints
-  A <- matrix( as.vector(partitions$cost), nrow=42^2, ncol=n.p2)
+  A <- matrix( as.vector(partitions$cost), nrow=n.subjects^2, ncol=n.p2)
   x <- cmdscale(partitions$distances, k=n.k)
 
 
@@ -132,7 +132,7 @@ partition.least.squares<- function(partitions, labels, n.k=15){
              "xtol_rel"=1.0e-5,
              "xtol_abs"=rep(1e-6, n.p2),
              "print_level"=1, 
-             "maxeval" = 200
+             "maxeval" = 100
              )
   res <- nloptr( x0 = rep(0, n.p2), 
                  eval_f = f.eval,
@@ -144,8 +144,88 @@ partition.least.squares<- function(partitions, labels, n.k=15){
   sol <- matrix(res$solution, n.partitions)
   dists.proj <- A %*% res$solution
  
-  list(sol = sol, dists.proj = dists.proj)
+  list(sol = sol, dists.proj = sqrt( dists.proj) )
 }
+
+
+
+
+partition.least.squares.individual<- function(partitions, labels, n.k=15){
+
+  n.subjects = dim(partitions$mass)[1]
+  n.partitions = dim(partitions$mass)[3]
+
+  n.p2 = n.partitions^2
+
+  #leasts quares with eqaulity constraints
+  A <- aperm( partitions$cost , c(3,1,4,2))
+  x <- cmdscale(partitions$distances, k=n.k)
+
+
+
+  data1 = data.frame( x, gender = as.factor(labels[,2]) )
+  levels( data1$gender ) <- c("F", "M", NA)
+  glm.model <- glm(gender ~ ., data=data1, family=binomial() )
+  glm.dir   <- glm.model$coefficients[-1]
+  glm.dir   <- glm.dir / sum(glm.dir^2)
+  x.proj <- x %*% glm.dir
+  B <- as.vector( as.matrix(dist(x.proj))^2 )
+
+  #least squares
+  f.eval <- function(x){
+    X  <- outer(x, x) 
+    print(dim(X))
+    X1 <- array(X, dim = c(n.partitions, n.subjects, n.partitions,  n.subjects) )    
+    y = apply( A * X1, c(2,4), sum )
+    delta = as.vector(y) - B
+    objective = sum( delta^2 )
+    print(objective)
+
+    xtmp = x
+    xtmp[x == 0] = 1
+    X <- sweep(X, 1, xtmp, "/")
+   
+    X1 <- array(X, dim = c(n.partitions, n.subjects, n.partitions,  n.subjects)  )
+    X1 = A * X1
+    y.g <- sweep( X1, c(2,4), matrix(2*delta, n.subjects), "*" )
+    y.g <- apply( y.g, c(1,2), sum)
+    list(objective=objective, gradient=as.vector(y.g) )
+  }
+
+
+
+  library(nloptr)
+
+  opts <- list( "algorithm"="NLOPT_LD_LBFGS", 
+                "xtol_rel"=1.0e-5,
+                "xtol_abs"=rep(1e-6, n.p2),
+                "print_level"=1, 
+                "maxeval" = 2000
+              )
+
+  res <- nloptr( x0 = rep(0.001, n.partitions * n.subjects), 
+                 eval_f = f.eval,
+                 lb = rep(0, n.partitions * n.subjects),
+                 ub = rep(1, n.partitions * n.subjects),
+                 opts = opts
+               )
+
+  sol <- matrix(res$solution, n.partitions)
+  X <- outer(res$solution, res$solution) 
+  X1 <- array(X, dim = c(n.partitions, n.subjects, n.partitions,  n.subjects) )  
+  y = apply( A * X1, c(2,4), sum )
+  delta = as.vector(y) - B
+  objective = sum( delta^2 )
+  print(objective)  
+ 
+  list(sol = sol, dists.proj = sqrt(y) )
+}
+
+
+
+
+
+
 
 
 
@@ -169,6 +249,8 @@ distance.fraction <- function(sol, dists.proj, A){
   colnames(sig.dist) <- c("fraction", "index1", "index2")
   sig.dist[order(fraction, decreasing=T), ]
 }
+
+
 
 
 distance.fraction.cor <- function(sol, dists.dir, A){
