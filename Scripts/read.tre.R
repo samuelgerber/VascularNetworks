@@ -2,6 +2,7 @@
 read.tree <- function(inputFile){
   con  <- file(inputFile, open = "r")
 
+  
   X = c()
   id = 0
   pid = 0

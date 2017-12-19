@@ -21,16 +21,16 @@ Edit scripts to point to the right data or process new data
 ## Optimal Transport
 
 Optimal transport interpolation between two vascular networks:
-![Alt text](/Scripts/ip.gif "Simple optimal transport interpolation between two brain vasacular networks")
+![Alt text](/Figures/ip.gif "Simple optimal transport interpolation between two brain vasacular networks")
 
 Interpolation using only x,y for transportation cost:
 
-![Alt text](/Scripts/ip2d.gif "Simple optimal transport interpolation between two brain vasacular networks")
+![Alt text](/Figures/ip2d.gif "Simple optimal transport interpolation between two brain vasacular networks")
 
 
 Result of projection of the pairwise optimal transport maps onto the direction best seperating male versus female (blue male surplus mass, orange female surplus mass)
 
-![Alt text](/Scripts/movie-loop.gif "Female versus male optimal transport projection")
+![Alt text](/Figures/movie-loop.gif "Female versus male optimal transport projection")
 
 
 
@@ -38,16 +38,16 @@ Result of projection of the pairwise optimal transport maps onto the direction b
 ### Multiresolution Optimal Transport
 Decompoition of vascular network into a multiresolution representation:
 
-![Alt text](/Scripts/multiresolution.png "Multiresolution decomposition of vascular network")
+![Alt text](/Figures/multiresolution.png "Multiresolution decomposition of vascular network")
 
 Optimal transport interpolation between two vascular networks using multiresoultion approach 1:
 Transport among scales within subject and map to different subject at coarsest scale.
 
-![Alt text](/Scripts/mv2ip.gif "Multiresolution optimal transport interpolation between two brain vasacular networks")
+![Alt text](/Figures/mv2ip.gif "Multiresolution optimal transport interpolation between two brain vasacular networks")
 
 
 
 Optimal transport interpolation between two vascular networks using multiresoultion approach o2:
 Transport between subjects at finest scale, decompose transport plan according to multiresolution representation of the two subjects.
 
-![Alt text](/Scripts/mip.gif "Multiresolution optimal transport interpolation between two brain vasacular networks")
+![Alt text](/Figures/mip.gif "Multiresolution optimal transport interpolation between two brain vasacular networks")
