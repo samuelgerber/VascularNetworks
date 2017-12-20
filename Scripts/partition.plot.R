@@ -624,47 +624,39 @@ plot3d.slices <- function(X1, col="#881111", alpha=1){
 
   library(rgl) 
 
-  xr = range(X1$x)
-  xr[1] = xr[1]-10
-  xr[2] = xr[2]+10
-  yr = range(X1$y)
-  yr[1] = yr[1]-10
-  yr[2] = yr[2]+10
-  zr = range(X1$z)
-  zr[1] = zr[1]-20
-  zr[2] = zr[2]+20
+  xr = c(0, 352) + 53
+  yr = c(0, 422) + 12 
+  zr = c(0, 226) - 55
 
   library(rgl)
-  plot3d( X1[ X1$r < 1.5,1:3], type="s", radius=X1[ X1$r < 1.5, 4], col=col, alpha=alpha,
-           box=FALSE, axes=FALSE,  xlab="", ylab="", zlab="" )
+  plot3d( X1[ ,1:3], type="s", radius=X1[ , 4], col=col, alpha=alpha,
+           box=FALSE, axes=TRUE,  xlab="", ylab="", zlab="" )
 
  zmat <- matrix(mean(zr),2,2)
  ymat <- matrix(mean(yr),2,2)
- xmat <- matrix(mean(xr),2,2)
+ xmat <- matrix(mean(xr),2,2)  
 
  g.xy <- expand.grid(xr[1:2], yr[1:2])
  g.xz <- expand.grid(xr[1:2], zr[2:1])
  g.yz <- expand.grid(yr[1:2], zr[2:1])
-# Setup the Texture coordinates - defaults seem to invert image
-# tms <- matrix(c(0,0,1,1),lnx,lny) # generic case (xy-maped texture looks like png file)
-# tmt <- matrix(c(0,1,0,1),lnx,lny)   
 
-#  tmt <- matrix(c(1,1,0,0),lnx,lny) # "correct case" (ball density look more like picture)
-#  tms <- matrix(c(1,0,1,0),lnx,lny) # I think the gameshot.png is in error  
-
-
-  # Texture file specified in question was stored locally in "gameshot.png"
-
-  persp3d(matrix(g.xy[,1], 2,2) , matrix(g.xy[,2], 2, 2),zmat,
-          lit=F,fog=T,color="white",textype="rgb",texture="BW-z.png",add=T)
+  persp3d(matrix(g.xy[,1], 2,2) , matrix(g.xy[,2], 2, 2), zmat,
+          lit=F,fog=T,color="white",textype="rgb",texture="BW-z.png",add=T, alpha=1)
 
   
   persp3d(matrix(g.xz[,1], 2,2) , ymat, matrix(g.xz[,2], 2, 2),
-          lit=F,fog=T,color="white",textype="rgb",texture="BW-x.png",add=T)
+          lit=F,fog=T,color="white",textype="rgb",texture="BW-x.png",add=T, alpha=0)
 
   
   persp3d(xmat, matrix(g.yz[,1], 2,2), matrix(g.yz[,2], 2, 2),
-                lit=F,fog=T,color="white",textype="rgb",texture="BW-y.png",add=T)
+                lit=F,fog=T,color="white",textype="rgb",texture="BW-y.png",add=T, alpha=1)
 
 }
 
+plot3d.vascular <- function(X1, col="#881111", alpha=1, add=FALSE){
+  library(rgl)
+  plot3d( X1[ ,1:3], type="s", radius=X1[ , 4], col=col, alpha=alpha,
+           box=FALSE, axes=FALSE,  xlab="", ylab="", zlab="", add=add )
+
+
+}
