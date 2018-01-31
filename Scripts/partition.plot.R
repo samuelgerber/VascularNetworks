@@ -642,14 +642,17 @@ plot3d.slices <- function(X1, col="#881111", alpha=1){
 
   persp3d(matrix(g.xy[,1], 2,2) , matrix(g.xy[,2], 2, 2), zmat,
           lit=F,fog=T,color="white",textype="rgb",texture="BW-z.png",add=T, alpha=1)
+          #lit=F,fog=T,color="white",textype="rgb",texture="BW-x2.png",add=T, alpha=1)
 
   
   persp3d(matrix(g.xz[,1], 2,2) , ymat, matrix(g.xz[,2], 2, 2),
-          lit=F,fog=T,color="white",textype="rgb",texture="BW-x.png",add=T, alpha=0)
+          lit=F,fog=T,color="white",textype="rgb",texture="BW-y.png",add=T, alpha=1)
+          #lit=F,fog=T,color="white",textype="rgb",texture="BW-y2.png",add=T, alpha=1)
 
   
   persp3d(xmat, matrix(g.yz[,1], 2,2), matrix(g.yz[,2], 2, 2),
-                lit=F,fog=T,color="white",textype="rgb",texture="BW-y.png",add=T, alpha=1)
+                lit=F,fog=T,color="white",textype="rgb",texture="BW-x.png",add=T, alpha=1)
+                #lit=F,fog=T,color="white",textype="rgb",texture="BW-z2.png",add=T, alpha=1)
 
 }
 
