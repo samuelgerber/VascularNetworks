@@ -6,7 +6,6 @@ library( RANN )
 
 
 sp.distances <- list()
-
 for( i in 1:length( graph.edges ) ){
   print(i)
   tree <- all$data[[i]]
@@ -25,4 +24,5 @@ for( i in 1:length( graph.edges ) ){
   x = x/max(x[index] )
 
   sp.distances[[i]] = x
+
 }
