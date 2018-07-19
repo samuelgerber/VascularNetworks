@@ -20,8 +20,8 @@ for( i in 1:length( graph.edges ) ){
   sp <- distances(g, to=seedpoints, weights=D)
   x <- apply(sp, 1, min)
   index = which( x != Inf )
-  x= x-min(x)
-  x = x/max(x[index] )
+  #x= x-min(x)
+  #x = x/max(x[index] )
 
   sp.distances[[i]] = x
 
